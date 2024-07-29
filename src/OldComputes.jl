@@ -1,3 +1,5 @@
+# I don't think I need to touch this because it's not used anyway
+
 function ComputeShiftold(s,l,m,n,a; ϵ = 10^(-10))
     #println("computing qnm")
     ψ = qnmfunctionnew(s,l,m,n,a)

@@ -1,12 +1,15 @@
+# This defines a structure where the first entry is some filename for the file corresponding to operator, and the second
+# entry is the filename of the file with the derivative of that operator. The third and fourth entries are the operator
+# and the derivative of that operator respectively
 struct OperatorShift
-    filenameδT::AbstractString
-    filename∂ωT::AbstractString
-    δT::Function
-    ∂ωT::Function
+    filename::AbstractString
+    Op::Function
 end
 
-function OperatorShift(file1::AbstractString,file2::AbstractString; additional_params = ())
-    δT = MakeδT(file1; additional_params = additional_params)
-    ∂ωT = Make∂ωT(file2; additional_params = additional_params)
-    OperatorShift(file1,file2,δT,∂ωT)
+# This function takes in two file names. Then it reads this file using Make... defined in ImportExpressionsFromFile.jl
+# to construct the actual operators from the csv file. Then it makes an OperatorShift construct with the names and
+# operators
+function OperatorShift(file::AbstractString; additional_params = ())
+    Op = MakeOp(file; additional_params = additional_params)
+    OperatorShift(file,Op)
 end

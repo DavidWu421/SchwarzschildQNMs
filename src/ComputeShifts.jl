@@ -1,3 +1,5 @@
+# I think this can remain the way it is. This is just defining the contour which should be the same.
+
 function ComputeShift(s,l,m,n,a,Op::OperatorShift)
     ##make domain
     r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);

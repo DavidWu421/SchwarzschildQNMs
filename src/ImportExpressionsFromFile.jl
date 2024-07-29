@@ -1,45 +1,24 @@
+# I think the first two functions in this file are fine. Last two may need changing
+
 function GetExprMetric(file)
     df = DataFrame(CSV.File(file,types=Dict(1=>String)))
     exprs = []
     for (d,f) ∈ eachrow(df[df.Coefficient .!= "0",[:Index,:Coefficient]])
-        #println((d,f))
+        # println((d,f))
         d = d == "-" ? "" : d
         d = replace(d,"th"=>"θ")
+        f = replace(f,"omega"=>"ω")
+        f = replace(f,"spina"=>"a")
         ps = "ψ"*d
         push!(exprs,"($f)*$(ps)(r,x)")
     end
     func_def = "$(join(exprs," + "))"
-    println(func_def)
+    # println(func_def)
     Meta.parse(func_def)
 end
 
-function GetExprDerivative(file)
-    df = DataFrame(CSV.File(file,types=Dict(1=>String)))
-    exprs = []
-    for (d,f) ∈ eachrow(df[df.Coefficient .!= "0",:])
-        #println((d,f))
-        d = d == "-" ? "" : d
-        d = replace(d,"th"=>"θ")
-        ps = "ψ"*d
-        push!(exprs,"($f)*$(ps)(r,x)")
-    end
-    func_def = "$(join(exprs," + "))"
-    println(func_def)
-    Meta.parse(func_def)
-end
-
-function MakeδT(file; additional_params = ())
+function MakeOp(file; additional_params = ())
     thisexpr = GetExprMetric(file)
-    @eval δT(r,x,a,m,ω,s,ψ11,ψ12,ψ22,ψ1,ψ2,ψ,$(additional_params...); M=1) = $thisexpr
-    δT
+    Op = eval(Meta.parse("((r,x,a,m,ω,s,ψ00,ψ01,ψ02,ψ03,ψ04,ψ05,ψ06,ψ10,ψ11,ψ12,ψ13,ψ14,ψ15,ψ16,ψ20,ψ21,ψ22,ψ23,ψ24,ψ25,ψ26,ψ30,ψ31,ψ32,ψ33,ψ34,ψ35,ψ36,ψ40,ψ41,ψ42,ψ43,ψ44,ψ45,ψ46,ψ50,ψ51,ψ52,ψ53,ψ54,ψ55,ψ56,ψ60,ψ61,ψ62,ψ63,ψ64,ψ65,ψ66,$(additional_params...); M=1) -> $thisexpr)"))
+    Op
 end
-
-#δT = MakeδT("TuekolskyShifts.csv")
-
-function Make∂ωT(file; additional_params = ())
-    thisexpr2 = GetExprDerivative(file)
-    @eval ∂ωT(r,x,a,m,ω,s,ψ11,ψ12,ψ22,ψ1,ψ2,ψ,$(additional_params...); M=1) = $thisexpr2
-    ∂ωT
-end
-
-#∂ωT = Make∂ωT("TuekolskyFrequencyDerivative.csv")
