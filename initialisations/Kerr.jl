@@ -16,33 +16,27 @@ file5 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/Sch
 file6 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/SchwarzschildQNMShifts/OperatorShifts/Schwarzschild/Iminuscoefficients.csv"
 
 
-∂ωOminus=OperatorShift(file2, conjugate=true)
+∂ωOminus=OperatorShift(file2)
 
 # qnmfunctionnew(s,l,m,n,a; qnm=qnm)
 
 ψ = qnmfunctionnew(-2,2,2,0,0.5)
-println("-2C:", ψ.S.Cllʼ)
 
-ψ2 = qnmfunctionnew(2,2,2,0,0.5)
-println("+2C:", ψ2.S.Cllʼ)
+weight = let s = ψ.s , a= ψ.a
+    (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
+end
 
-println(ψ.S.Cllʼ-ψ2.S.Cllʼ)
+println("omega:", ψ.ω)
 
+println("weight(1,0):", weight(1,0))
+println("ψ00(1,0)=",ψ(1,0))
 
-# weight = let s = ψ.s , a= ψ.a
-#     (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
-# end
+∂ωOminuss = OperatorSandwich(ψ,∂ωOminus,weight,ψ)
+∂ωOminus = ∂ωOminuss.Op;
 
-# println("omega:", ψ.ω)
-# println("+2C:", ψ.S.Cllʼ)
-
-# println("weight(1,0):", weight(1,0))
-# println("ψ00(1,0)=",ψ(1,0))
-
-# ∂ωOminuss = OperatorSandwich(ψ,∂ωOminus,weight,ψ)
-# ∂ωOminus = ∂ωOminuss.Op;
-
-# ∂ωOminus(1,0) |> println 
+∂ωOminus(1,0,isconjugate=true) |> println
+∂ωOminus(1,0) |> println 
+∂ωOminus(1,0,isconjugate=false) |> println 
 
 
 # testfunc=qnmfunctionnew(-2,2,2,0,0.5)
