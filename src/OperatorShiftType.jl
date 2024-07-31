@@ -9,7 +9,8 @@ end
 # This function takes in two file names. Then it reads this file using Make... defined in ImportExpressionsFromFile.jl
 # to construct the actual operators from the csv file. Then it makes an OperatorShift construct with the names and
 # operators
-function OperatorShift(file::AbstractString; additional_params = ())
-    Op = MakeOp(file; additional_params = additional_params)
+function OperatorShift(file::AbstractString; conjugate = false)
+    Op = MakeOp(file; conjugate=conjugate)
+    # println(Op(2.2,.2))
     OperatorShift(file,Op)
 end

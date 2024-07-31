@@ -1,9 +1,11 @@
 # Add the path to your local package to the LOAD_PATH
-push!(LOAD_PATH, "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/ContourIntegrals.jl")
-push!(LOAD_PATH, "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/SchwarzschildQNMShifts")
+push!(LOAD_PATH, "C:/Users/dwuuu/Documents/GitHub/ContourIntegrals.jl")
+push!(LOAD_PATH, "C:/Users/dwuuu/Documents/GitHub/SchwarzschildQNMs")
+push!(LOAD_PATH, "C:/Users/dwuuu/Documents/GitHub/KerrQuasinormalModes.jl")
 
 using ContourIntegrals
 using KerrQNMShifts
+
 
 ### Use expressions for the operators, noted in their respective csvs
 file1 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/SchwarzschildQNMShifts/OperatorShifts/Schwarzschild/dwOpluscoefficients.csv"
@@ -14,51 +16,86 @@ file5 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/Sch
 file6 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/SchwarzschildQNMShifts/OperatorShifts/Schwarzschild/Iminuscoefficients.csv"
 
 
-# The below function prints out what each operator is from both file 1 and file2
-∂ωOplus = OperatorShift(file1)
-∂ωOminus= OperatorShift(file2)
-Hplus = OperatorShift(file3)
-Hminus = OperatorShift(file4)
-Iplus = OperatorShift(file5)
-Iminus = OperatorShift(file6)
+∂ωOminus=OperatorShift(file2, conjugate=true)
+
+# qnmfunctionnew(s,l,m,n,a; qnm=qnm)
+
+ψ = qnmfunctionnew(-2,2,2,0,0.5)
+println("-2C:", ψ.S.Cllʼ)
+
+ψ2 = qnmfunctionnew(2,2,2,0,0.5)
+println("+2C:", ψ2.S.Cllʼ)
+
+println(ψ.S.Cllʼ-ψ2.S.Cllʼ)
 
 
-### Get the integrand in the contour integral for the inner product computation
-# qnmfunctionnew(s,l,m,n,a, plusminus);
-ψplus = qnmfunctionnew(-2,2,2,0,0.5,"plus")
-ψminus = qnmfunctionnew(-2,2,2,0,0.5,"minus")
+# weight = let s = ψ.s , a= ψ.a
+#     (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
+# end
 
-weight = let s = ψplus.s , a= ψplus.a
-    (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
-end
+# println("omega:", ψ.ω)
+# println("+2C:", ψ.S.Cllʼ)
 
-∂ωOpluss = OperatorSandwich(ψplus,∂ωOplus,weight,ψplus)
-∂ωOplus = ∂ωOpluss.Op;
+# println("weight(1,0):", weight(1,0))
+# println("ψ00(1,0)=",ψ(1,0))
 
-∂ωOminuss = OperatorSandwich(ψminus,∂ωOminus,weight,ψminus)
-∂ωOminus = ∂ωOminuss.Op;
+# ∂ωOminuss = OperatorSandwich(ψ,∂ωOminus,weight,ψ)
+# ∂ωOminus = ∂ωOminuss.Op;
 
-Hpluss = OperatorSandwich(ψplus,Hplus,weight,ψplus)
-Hplus = Hpluss.Op;
+# ∂ωOminus(1,0) |> println 
 
-Hminuss = OperatorSandwich(ψminus,Hminus,weight,ψminus)
-Hminus = Hminuss.Op;
 
-Ipluss = OperatorSandwich(ψplus,Iplus,weight,ψminus)
-Iplus = Ipluss.Op;
+# testfunc=qnmfunctionnew(-2,2,2,0,0.5)
+# println(testfunc(0))
+# println(testfunc(0, conjugate=true))
 
-Iminuss = OperatorSandwich(ψminus,Iminus,weight,ψplus)
-Iminus = Iminuss.Op;
 
-println("Second Print")
 
-### Compute the expressions so that they compile the first time
-∂ωOplus(2.2,0.1) |> println
-∂ωOminus(2.2,0.1) |> println
-Hplus(2.2,0.1) |> println
-Hminus(2.2,0.1) |> println
-Iplus(2.2,0.1) |> println
-Iminus(2.2,0.1) |> println
+# # The below function prints out what each operator is from both file 1 and file2
+# ∂ωOplus = OperatorShift(file1)
+# ∂ωOminus= OperatorShift(file2)
+# Hplus = OperatorShift(file3)
+# Hminus = OperatorShift(file4)
+# Iplus = OperatorShift(file5)
+# Iminus = OperatorShift(file6)
+
+
+# ### Get the integrand in the contour integral for the inner product computation
+# # qnmfunctionnew(s,l,m,n,a, plusminus);
+# ψplus = qnmfunctionnew(-2,2,2,0,0.5,"plus")
+# ψminus = qnmfunctionnew(-2,2,2,0,0.5,"minus")
+
+# weight = let s = ψplus.s , a= ψplus.a
+#     (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
+# end
+
+# ∂ωOpluss = OperatorSandwich(ψplus,∂ωOplus,weight,ψplus)
+# ∂ωOplus = ∂ωOpluss.Op;
+
+# ∂ωOminuss = OperatorSandwich(ψminus,∂ωOminus,weight,ψminus)
+# ∂ωOminus = ∂ωOminuss.Op;
+
+# Hpluss = OperatorSandwich(ψplus,Hplus,weight,ψplus)
+# Hplus = Hpluss.Op;
+
+# Hminuss = OperatorSandwich(ψminus,Hminus,weight,ψminus)
+# Hminus = Hminuss.Op;
+
+# Ipluss = OperatorSandwich(ψplus,Iplus,weight,ψminus)
+# Iplus = Ipluss.Op;
+
+# Iminuss = OperatorSandwich(ψminus,Iminus,weight,ψplus)
+# Iminus = Iminuss.Op;
+
+# println("Second Print")
+
+# ### Compute the expressions so that they compile the first time
+# ∂ωOplus(2.2,0.1) |> println
+# ∂ωOminus(2.2,0.1) |> println
+# Hplus(2.2,0.1) |> println
+# Hminus(2.2,0.1) |> println
+# Iplus(2.2,0.1) |> println
+# Iminus(2.2,0.1) |> println
 
 # ### Define the useful contours
 # r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
