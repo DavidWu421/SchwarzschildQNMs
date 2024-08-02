@@ -14,6 +14,7 @@ include("KerrQuasinormalModeAdditions.jl")
 include("ImportExpressionsFromFile.jl")
 include("OperatorShiftType.jl")
 include("OperatorSandwichType.jl")
+include("ConstructFreqPerturbation.jl")
 
 
 export qnm, qnmfunctionnew, importqnm
