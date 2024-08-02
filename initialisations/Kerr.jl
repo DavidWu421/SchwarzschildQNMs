@@ -17,6 +17,15 @@ file6 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/Sch
 
 ψ = qnmfunctionnew(-2,2,2,0,0.5)
 
+# testop=1.0+0.5im
+# testom=1.0+0.5im
+# testhp=1.0+0.5im
+# testhm=1.0+0.5im
+# testip=1.0+0.5im
+# testim=1.0+0.5im
+
+# @show Computeω2(testop,testom,testhp,testhm,testip,testim,ψ)
+
 weight = let s = ψ.s , a= ψ.a
     (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
 end
@@ -58,27 +67,27 @@ end
 # @show Iplus(1,0,isconjugate=false)
 # @show Iminus(1,0,isconjugate=true)
 
-# ### Define the useful contours
-# r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
+### Define the useful contours
+r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
 
-# point1 = r₊ + Δr - Δr*im
-# point2 = r₊ - Δr - Δr*im
+point1 = r₊ + Δr - Δr*im
+point2 = r₊ - Δr - Δr*im
 
-# radial1 = SemiInfiniteLine(point1 , point1 + Δr*im , false)
-# angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
-# C1 = radial1 ⊗ angular
+radial1 = SemiInfiniteLine(point1 , point1 + Δr*im , false)
+angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+C1 = radial1 ⊗ angular
 
-# radial2 = LineSegment(point1,point2,true)
-# C2 = radial2 ⊗ angular
+radial2 = LineSegment(point1,point2,true)
+C2 = radial2 ⊗ angular
 
-# radial3 = SemiInfiniteLine(point2 , point2 + Δr*im , true)
-# C3 = radial3 ⊗ angular
+radial3 = SemiInfiniteLine(point2 , point2 + Δr*im , true)
+C3 = radial3 ⊗ angular
 
-# TheContour = C1⊕C2⊕C3
+TheContour = C1⊕C2⊕C3
 
-# println("Just integrals left")
+println("Just integrals left")
 
-# @show Integrate(∂ωOplus, TheContour)
+@show Integrate(∂ωOplus, TheContour)
 # @show Integrate(∂ωOminus, TheContour)
 # @show Integrate(Hplus, TheContour)
 # @show Integrate(Hminus, TheContour)
