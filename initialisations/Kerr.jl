@@ -15,87 +15,80 @@ file4 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/Sch
 file5 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/SchwarzschildQNMShifts/OperatorShifts/Schwarzschild/Ipluscoefficients.csv"
 file6 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/SchwarzschildQNMShifts/OperatorShifts/Schwarzschild/Iminuscoefficients.csv"
 
-∂ωOplus = OperatorShift(file1)
-∂ωOminus= OperatorShift(file2)
-Hplus = OperatorShift(file3)
-Hminus = OperatorShift(file4)
-Iplus = OperatorShift(file5)
-Iminus = OperatorShift(file6)
+filetest="C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/derivtestcoefficients.csv"
 
-# ψ = qnmfunctionnew(-2,2,2,0,0.5)
+testshift = OperatorShift(filetest)
+
+# ∂ωOplus = OperatorShift(file1)
+# ∂ωOminus= OperatorShift(file2)
+# Hplus = OperatorShift(file3)
+# Hminus = OperatorShift(file4)
+# Iplus = OperatorShift(file5)
+# Iminus = OperatorShift(file6)
+
+ψ1 = qnmfunctionnew(-2,2,2,0,0.5)
 # ψ2 = qnmfunctionnew(-2,2,2,0,0.0)
 # ψ3 = qnmfunctionnew(-2,2,2,0,0.0000001)
 
-ψm2even=qnmfunctionnew(-2,2,2,0,0.5)
-ψp2even=qnmfunctionnew(2,2,2,0,0.5)
-ψm2odd=qnmfunctionnew(-2,3,2,0,0.5)
-ψp2odd=qnmfunctionnew(2,3,2,0,0.5)
-ψm2oddalt=qnmfunctionnew(-2,5,3,0,0.5)
-ψp2oddalt=qnmfunctionnew(2,5,3,0,0.5)
+weight = let s = ψ1.s , a= ψ1.a
+    (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
+end
 
-println("Check ψm2even conjugates:")
-@show ψm2even.R(0.5)
-@show ψm2even.R(0.5,isconjugate=true)
-@show ψm2even.S(0.2)
-@show ψm2even.S(0.2,isconjugate=true)
-@show ψm2even(0.5,0.2)
-@show ψm2even(0.5,0.2,isconjugate=true)
-println("Check ψm2even isminus:")
-@show ψm2even.R(0.5)
-@show ψm2even.R(0.5,isminus=true)
-@show ψp2even.S(0.2)
-@show ψm2even.S(0.2,isminus=true)
-@show ψm2even(0.5,.2)
-@show ψm2even(0.5,.2,isminus=true)
-println("Check ψm2oddalt isminus:")
-@show ψm2oddalt.R(0.5)
-@show ψm2oddalt.R(0.5,isminus=true)
-@show ψm2oddalt.S(0.2)
-@show ψm2oddalt.S(0.2,isminus=true)
-@show ψm2oddalt(0.5,.2)
-@show ψm2oddalt(0.5,.2,isminus=true)
+testshifts1=OperatorSandwich(ψ1,testshift,weight,ψ1)
+testshift1 = testshifts1.Op;
 
-
-# weight = let s = ψ.s , a= ψ.a
-#     (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
-# end
-
-# ∂ωOpluss1 = OperatorSandwich(ψ,∂ωOplus,weight,ψ)
+# ∂ωOpluss1 = OperatorSandwich(ψ1,∂ωOplus,weight,ψ1)
 # ∂ωOplus1 = ∂ωOpluss1.Op;
 
-# ∂ωOminuss1 = OperatorSandwich(ψ,∂ωOminus,weight,ψ)
+# ∂ωOminuss1 = OperatorSandwich(ψ1,∂ωOminus,weight,ψ1)
 # ∂ωOminus1 = ∂ωOminuss1.Op;
 
-# Hpluss1 = OperatorSandwich(ψ,Hplus,weight,ψ)
+# Hpluss1 = OperatorSandwich(ψ1,Hplus,weight,ψ1)
 # Hplus1 = Hpluss1.Op;
 
-# Hminuss1 = OperatorSandwich(ψ,Hminus,weight,ψ)
+# Hminuss1 = OperatorSandwich(ψ1,Hminus,weight,ψ1)
 # Hminus1 = Hminuss1.Op;
 
-# Ipluss1 = OperatorSandwich(ψ,Iplus,weight,ψ)
+# Ipluss1 = OperatorSandwich(ψ1,Iplus,weight,ψ1)
 # Iplus1 = Ipluss1.Op;
 
-# Iminuss1 = OperatorSandwich(ψ,Iminus,weight,ψ)
+# Iminuss1 = OperatorSandwich(ψ1,Iminus,weight,ψ1)
 # Iminus1 = Iminuss1.Op;
 
+@show ψ1(0.5,.2)
+@show ψ1(0.5,.2,isconjugate=true)
+@show ψ1(0.5,.2,isminus=true)
+@show ψ1(0.5,.2,isminus=true,isconjugate=true)
 
-# ∂ωOpluss2 = OperatorSandwich(ψ2,∂ωOplus,weight,ψ2)
-# ∂ωOplus2 = ∂ωOpluss2.Op;
+@show testshift1(0.5,.2)
+@show testshift1(0.5,.2,isconjugate=true)
+@show testshift1(0.5,.2,isminus=true)
+@show testshift1(0.5,.2,LHSisminus=true)
+@show testshift1(0.5,.2,isconjugate=true,isminus=true)
+@show testshift1(0.5,.2,isconjugate=true,LHSisminus=true)
+@show testshift1(0.5,.2,isminus=true,LHSisminus=true)
 
-# ∂ωOminuss2 = OperatorSandwich(ψ2,∂ωOminus,weight,ψ2)
-# ∂ωOminus2 = ∂ωOminuss2.Op;
 
-# Hpluss2 = OperatorSandwich(ψ2,Hplus,weight,ψ2)
-# Hplus2 = Hpluss2.Op;
 
-# Hminuss2 = OperatorSandwich(ψ2,Hminus,weight,ψ2)
-# Hminus2 = Hminuss2.Op;
 
-# Ipluss2 = OperatorSandwich(ψ2,Iplus,weight,ψ2)
-# Iplus2 = Ipluss2.Op;
+# @show ∂ωOplus1(0.5,.2)
+# @show ∂ωOplus1(0.5,.2,isconjugate=true)
+# @show ∂ωOplus1(0.5,.2,isminus=true)
+# @show ∂ωOplus1(0.5,.2,LHSisminus=true)
+# @show ∂ωOplus1(0.5,.2,isconjugate=true,isminus=true)
+# @show ∂ωOplus1(0.5,.2,isconjugate=true,LHSisminus=true)
+# @show ∂ωOplus1(0.5,.2,isminus=true,LHSisminus=true)
 
-# Iminuss2 = OperatorSandwich(ψ2,Iminus,weight,ψ2)
-# Iminus2 = Iminuss2.Op;
+
+
+# @show ∂ωOminus1(0.5,.2,LHSisminus=true)
+# @show Hplus1(0.5,.2)
+# @show Hplus1(0.5,.2,isconjugate=true)
+# @show Hplus1(0.5,.2,isminus=true)
+# @show Hplus1(0.5,.2,LHSisminus=true)
+# @show Hplus1(0.5,.2,isconjugate=true, isminus=true)
+# @show Hplus1(0.5,.2,isconjugate=true,isminus=true,LHSisminus=true)
+# @show Hplus1(0.5,.2,LHSisminus=true)
 
 
 # ∂ωOpluss3 = OperatorSandwich(ψ3,∂ωOplus,weight,ψ3)
@@ -118,8 +111,6 @@ println("Check ψm2oddalt isminus:")
 
 # @show ∂ωOplus1(1,0)
 # @show ∂ωOminus1(1,0)
-
-
 # @show Hplus1(0.5,.2)
 # @show Hplus1(0.5,.2,isconjugate=true)
 # @show Hplus1(0.5,.2,isminus=true)

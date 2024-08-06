@@ -13,7 +13,7 @@ function GetExprMetric(file)
         push!(exprs,"($f)*$(ps)(r,x;isconjugate=isconjugate,isminus=isminus)")
     end
     func_def = "$(join(exprs," + "))"
-    # println(func_def)
+    println(func_def)
     Meta.parse(func_def)
 end
 

@@ -11,6 +11,5 @@ end
 # operators
 function OperatorShift(file::AbstractString)
     Op = MakeOp(file)
-    # println(Op(2.2,.2))
     OperatorShift(file,Op)
 end
