@@ -15,84 +15,207 @@ file4 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/Sch
 file5 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/SchwarzschildQNMShifts/OperatorShifts/Schwarzschild/Ipluscoefficients.csv"
 file6 = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/ComputeQNMs/SchwarzschildQNMShifts/OperatorShifts/Schwarzschild/Iminuscoefficients.csv"
 
-ψ = qnmfunctionnew(-2,2,2,0,0.5)
-
-# testop=1.0+0.5im
-# testom=1.0+0.5im
-# testhp=1.0+0.5im
-# testhm=1.0+0.5im
-# testip=1.0+0.5im
-# testim=1.0+0.5im
-
-# @show Computeω2(testop,testom,testhp,testhm,testip,testim,ψ)
-
-weight = let s = ψ.s , a= ψ.a
-    (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
-end
-
 ∂ωOplus = OperatorShift(file1)
-# ∂ωOminus= OperatorShift(file2)
-# Hplus = OperatorShift(file3)
-# Hminus = OperatorShift(file4)
-# Iplus = OperatorShift(file5)
-# Iminus = OperatorShift(file6)
+∂ωOminus= OperatorShift(file2)
+Hplus = OperatorShift(file3)
+Hminus = OperatorShift(file4)
+Iplus = OperatorShift(file5)
+Iminus = OperatorShift(file6)
 
-∂ωOpluss = OperatorSandwich(ψ,∂ωOplus,weight,ψ)
-∂ωOplus = ∂ωOpluss.Op;
+# ψ = qnmfunctionnew(-2,2,2,0,0.5)
+# ψ2 = qnmfunctionnew(-2,2,2,0,0.0)
+# ψ3 = qnmfunctionnew(-2,2,2,0,0.0000001)
 
-# ∂ωOminuss = OperatorSandwich(ψ,∂ωOminus,weight,ψ)
-# ∂ωOminus = ∂ωOminuss.Op;
+ψm2even=qnmfunctionnew(-2,2,2,0,0.5)
+ψp2even=qnmfunctionnew(2,2,2,0,0.5)
+ψm2odd=qnmfunctionnew(-2,3,2,0,0.5)
+ψp2odd=qnmfunctionnew(2,3,2,0,0.5)
+ψm2oddalt=qnmfunctionnew(-2,5,3,0,0.5)
+ψp2oddalt=qnmfunctionnew(2,5,3,0,0.5)
 
-# Hpluss = OperatorSandwich(ψ,Hplus,weight,ψ)
-# Hplus = Hpluss.Op;
+println("Check ψm2even conjugates:")
+@show ψm2even.R(0.5)
+@show ψm2even.R(0.5,isconjugate=true)
+@show ψm2even.S(0.2)
+@show ψm2even.S(0.2,isconjugate=true)
+@show ψm2even(0.5,0.2)
+@show ψm2even(0.5,0.2,isconjugate=true)
+println("Check ψm2even isminus:")
+@show ψm2even.R(0.5)
+@show ψm2even.R(0.5,isminus=true)
+@show ψp2even.S(0.2)
+@show ψm2even.S(0.2,isminus=true)
+@show ψm2even(0.5,.2)
+@show ψm2even(0.5,.2,isminus=true)
+println("Check ψm2oddalt isminus:")
+@show ψm2oddalt.R(0.5)
+@show ψm2oddalt.R(0.5,isminus=true)
+@show ψm2oddalt.S(0.2)
+@show ψm2oddalt.S(0.2,isminus=true)
+@show ψm2oddalt(0.5,.2)
+@show ψm2oddalt(0.5,.2,isminus=true)
 
-# Hminuss = OperatorSandwich(ψ,Hminus,weight,ψ)
-# Hminus = Hminuss.Op;
 
-# Ipluss = OperatorSandwich(ψ,Iplus,weight,ψ)
-# Iplus = Ipluss.Op;
+# weight = let s = ψ.s , a= ψ.a
+#     (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
+# end
 
-# Iminuss = OperatorSandwich(ψ,Iminus,weight,ψ)
-# Iminus = Iminuss.Op;
+# ∂ωOpluss1 = OperatorSandwich(ψ,∂ωOplus,weight,ψ)
+# ∂ωOplus1 = ∂ωOpluss1.Op;
 
-@show ∂ωOplus(1,0)
-@show ∂ωOplus(1,0;LHSisconjugate=false)
-@show ∂ωOplus(1,0;LHSisconjugate=true)
-# @show ∂ωOminus(1,0)
-# ∂ωOminus(1,0,isconjugate=true,isminus=true) |> println
-# @show typeof(∂ωOminus)
-# @show typeof(Hplus)
-# @show Hplus(1,0,isconjugate=true)
-# @show Hminus(1,0,isconjugate=false)
-# @show Iplus(1,0,isconjugate=false)
-# @show Iminus(1,0,isconjugate=true)
+# ∂ωOminuss1 = OperatorSandwich(ψ,∂ωOminus,weight,ψ)
+# ∂ωOminus1 = ∂ωOminuss1.Op;
 
-### Define the useful contours
-r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
+# Hpluss1 = OperatorSandwich(ψ,Hplus,weight,ψ)
+# Hplus1 = Hpluss1.Op;
 
-point1 = r₊ + Δr - Δr*im
-point2 = r₊ - Δr - Δr*im
+# Hminuss1 = OperatorSandwich(ψ,Hminus,weight,ψ)
+# Hminus1 = Hminuss1.Op;
 
-radial1 = SemiInfiniteLine(point1 , point1 + Δr*im , false)
-angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
-C1 = radial1 ⊗ angular
+# Ipluss1 = OperatorSandwich(ψ,Iplus,weight,ψ)
+# Iplus1 = Ipluss1.Op;
 
-radial2 = LineSegment(point1,point2,true)
-C2 = radial2 ⊗ angular
+# Iminuss1 = OperatorSandwich(ψ,Iminus,weight,ψ)
+# Iminus1 = Iminuss1.Op;
 
-radial3 = SemiInfiniteLine(point2 , point2 + Δr*im , true)
-C3 = radial3 ⊗ angular
 
-TheContour = C1⊕C2⊕C3
+# ∂ωOpluss2 = OperatorSandwich(ψ2,∂ωOplus,weight,ψ2)
+# ∂ωOplus2 = ∂ωOpluss2.Op;
 
-println("Just integrals left")
+# ∂ωOminuss2 = OperatorSandwich(ψ2,∂ωOminus,weight,ψ2)
+# ∂ωOminus2 = ∂ωOminuss2.Op;
 
-@show Integrate(∂ωOplus, TheContour)
-# @show Integrate(∂ωOminus, TheContour)
-# @show Integrate(Hplus, TheContour)
-# @show Integrate(Hminus, TheContour)
-# @show Integrate(Iplus, TheContour)
-# @show Integrate(Iminus, TheContour)
+# Hpluss2 = OperatorSandwich(ψ2,Hplus,weight,ψ2)
+# Hplus2 = Hpluss2.Op;
+
+# Hminuss2 = OperatorSandwich(ψ2,Hminus,weight,ψ2)
+# Hminus2 = Hminuss2.Op;
+
+# Ipluss2 = OperatorSandwich(ψ2,Iplus,weight,ψ2)
+# Iplus2 = Ipluss2.Op;
+
+# Iminuss2 = OperatorSandwich(ψ2,Iminus,weight,ψ2)
+# Iminus2 = Iminuss2.Op;
+
+
+# ∂ωOpluss3 = OperatorSandwich(ψ3,∂ωOplus,weight,ψ3)
+# ∂ωOplus3 = ∂ωOpluss3.Op;
+
+# ∂ωOminuss3 = OperatorSandwich(ψ3,∂ωOminus,weight,ψ3)
+# ∂ωOminus3 = ∂ωOminuss3.Op;
+
+# Hpluss3 = OperatorSandwich(ψ3,Hplus,weight,ψ3)
+# Hplus3 = Hpluss3.Op;
+
+# Hminuss3 = OperatorSandwich(ψ3,Hminus,weight,ψ3)
+# Hminus3 = Hminuss3.Op;
+
+# Ipluss3 = OperatorSandwich(ψ3,Iplus,weight,ψ3)
+# Iplus3 = Ipluss3.Op;
+
+# Iminuss3 = OperatorSandwich(ψ3,Iminus,weight,ψ3)
+# Iminus3 = Iminuss3.Op;
+
+# @show ∂ωOplus1(1,0)
+# @show ∂ωOminus1(1,0)
+
+
+# @show Hplus1(0.5,.2)
+# @show Hplus1(0.5,.2,isconjugate=true)
+# @show Hplus1(0.5,.2,isminus=true)
+# @show Hplus1(0.5,.2,LHSisminus=true)
+# @show Hplus1(0.5,.2,isconjugate=true, isminus=true)
+# @show Hplus1(0.5,.2,isconjugate=true,isminus=true,LHSisminus=true)
+# @show Hplus1(0.5,.2,LHSisminus=true)
+
+# @show Hminus1(1,0)
+# @show Iplus1(1,0)
+# @show Iminus1(1,0)
+
+# @show ∂ωOplus2(1,0)
+# @show ∂ωOminus2(1,0)
+# @show Hplus2(1,0)
+# @show Hminus2(1,0)
+# @show Iplus2(1,0)
+# @show Iminus2(1,0)
+
+# @show ∂ωOplus3(1,0)
+# @show ∂ωOminus3(1,0)
+# @show Hplus3(1,0)
+# @show Hminus3(1,0)
+# @show Iplus3(1,0)
+# @show Iminus3(1,0)
+
+# ### Define the useful contours
+# r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
+
+# point1 = r₊ + Δr - Δr*im
+# point2 = r₊ - Δr - Δr*im
+
+# radial1 = SemiInfiniteLine(point1 , point1 + Δr*im , false)
+# angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+# C1 = radial1 ⊗ angular
+
+# radial2 = LineSegment(point1,point2,true)
+# C2 = radial2 ⊗ angular
+
+# radial3 = SemiInfiniteLine(point2 , point2 + Δr*im , true)
+# C3 = radial3 ⊗ angular
+
+# TheContour = C1⊕C2⊕C3
+
+# println("Just integrals left")
+
+# 𝒪plus= Integrate(∂ωOplus, TheContour)[1]
+# 𝒪minus= conj(Integrate(∂ωOminus, TheContour,isminus=true,LHSisminus=true)[1])
+# println("Done O's")
+# ℋplus= Integrate(Hplus, TheContour)[1]
+# println("Done Hplus")
+# ℋminus= conj(Integrate(Hminus, TheContour,isminus=true,LHSisminus=true)[1])
+# println("Done Hminus")
+# ℐplus= Integrate(Iplus, TheContour,isconjugate=true,isminus=true)[1]
+# println("Done Iplus")
+# ℐminus= conj(Integrate(Iminus, TheContour,isconjugate=true,LHSisminus=true)[1])
+# println("Done Iminus")
+
+# ω2shift=Computeω2(𝒪plus,𝒪minus,ℋplus,ℋminus,ℐplus,ℐminus,ψ)
+# @show ω2shift
+
+# 𝒪plus2= Integrate(∂ωOplus2, TheContour)[1]
+# 𝒪minus2= conj(Integrate(∂ωOminus2, TheContour,isminus=true,LHSisminus=true)[1])
+# println("Done O's")
+# ℋplus2= Integrate(Hplus2, TheContour)[1]
+# println("Done Hplus")
+# ℋminus2= conj(Integrate(Hminus2, TheContour,isminus=true,LHSisminus=true)[1])
+# println("Done Hminus")
+# ℐplus2= Integrate(Iplus2, TheContour,isconjugate=true,isminus=true)[1]
+# println("Done Iplus")
+# ℐminus2= conj(Integrate(Iminus2, TheContour,isconjugate=true,LHSisminus=true)[1])
+# println("Done Iminus")
+
+# 𝒪plus3=-0.11044200242553877 + 0.49269650825808775im
+# 𝒪minus3=-0.001844270788297432 + 0.042774974720934486im
+# ℋplus3=-2.445285430275201e-7 + 1.0519871516885872e-7im
+# ℋminus3=1.1008476910844426e-7 + 2.925268041340887e-7im
+# ℐplus3=3.274068559342357e-6 + 9.925224697278246e-6im
+# ℐminus3=2.2486149550283164e-6 - 3.7324257307655107e-6im
+
+
+# ω2shift3=Computeω2(𝒪plus3,𝒪minus3,ℋplus3,ℋminus3,ℐplus3,ℐminus3,ψ3)
+# @show ω2shift3
+
+
+# 𝒪plus3= Integrate(∂ωOplus3, TheContour)[1]
+# 𝒪minus3= conj(Integrate(∂ωOminus3, TheContour,isminus=true,LHSisminus=true)[1])
+# println("Done O's")
+# ℋplus3= Integrate(Hplus3, TheContour)[1]
+# println("Done Hplus")
+# ℋminus3= conj(Integrate(Hminus3, TheContour,isminus=true,LHSisminus=true)[1])
+# println("Done Hminus")
+# ℐplus3= Integrate(Iplus3, TheContour,isconjugate=true,isminus=true)[1]
+# println("Done Iplus")
+# ℐminus3= conj(Integrate(Iminus3, TheContour,isconjugate=true,LHSisminus=true)[1])
+# println("Done Iminus")
 
 # println("R's")
 # println(ψ.R(1))
@@ -241,35 +364,3 @@ println("Just integrals left")
 # C3 = radial3 ⊗ angular
 
 # TheContour = C1⊕C2⊕C3
-
-# ### Define Transformed Functions (that live on the compactified domain [0,1]⊗[0,1])
-# δTₒ = TransformIntegrand(δT , thedomain)
-# ∂ωTₒ = TransformIntegrand(∂ωT , thedomain)
-
-# ### Compute the expressions so that they compile the first time
-# δTₒ(0.1,0.1) |> println
-# ∂ωTₒ(0.1,0.1) |> println
-
-# #=
-# ### Use expressions for the operators, noted in their respective csvs
-# file1b = "OperatorShifts/KerrNewman0/TuekolskyShifts.csv"
-# file2b = "OperatorShifts/KerrNewman0/TuekolskyFrequencyDerivative.csv"
-# Tb = OperatorShift(file1b,file2b)
-
-# ### Get the integrand in the contour integral for the inner product computation
-# Tsb = OperatorSandwich(ψ,Tb,weight,ψ)
-# δTb = Tsb.δT;
-# ∂ωTb = Tsb.∂ωT;
-
-# ### Compute the expressions so that they compile the first time
-# δTb(2.2,0.1) |> println
-# ∂ωTb(2.2,0.1) |> println
-
-# ### Define Transformed Functions (that live on the compactified domain [0,1]⊗[0,1])
-# δTbₒ = TransformIntegrand(δTb , thedomain)
-# ∂ωTbₒ = TransformIntegrand(∂ωTb , thedomain)
-
-# ### Compute the expressions so that they compile the first time
-# δTbₒ(0.1,0.1) |> println
-# ∂ωTbₒ(0.1,0.1) |> println
-# =#
