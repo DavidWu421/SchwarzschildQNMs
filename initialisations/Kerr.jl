@@ -27,15 +27,17 @@ testshift = OperatorShift(filetest)
 # Iminus = OperatorShift(file6)
 
 ψ1 = qnmfunctionnew(-2,2,2,0,0.5)
+ψ2 = qnmfunctionnew(-2,2,2,0,0.5,modesign="minus")
+ψ3 = qnmfunctionnew(2,2,2,0,0.5)
 # ψ2 = qnmfunctionnew(-2,2,2,0,0.0)
 # ψ3 = qnmfunctionnew(-2,2,2,0,0.0000001)
 
-weight = let s = ψ1.s , a= ψ1.a
-    (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
-end
+# weight = let s = ψ1.s , a= ψ1.a
+#     (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
+# end
 
-testshifts1=OperatorSandwich(ψ1,testshift,weight,ψ1)
-testshift1 = testshifts1.Op;
+# testshifts1=OperatorSandwich(ψ1,testshift,weight,ψ1)
+# testshift1 = testshifts1.Op;
 
 # ∂ωOpluss1 = OperatorSandwich(ψ1,∂ωOplus,weight,ψ1)
 # ∂ωOplus1 = ∂ωOpluss1.Op;
@@ -55,18 +57,18 @@ testshift1 = testshifts1.Op;
 # Iminuss1 = OperatorSandwich(ψ1,Iminus,weight,ψ1)
 # Iminus1 = Iminuss1.Op;
 
-@show ψ1(0.5,.2)
-@show ψ1(0.5,.2,isconjugate=true)
-@show ψ1(0.5,.2,isminus=true)
-@show ψ1(0.5,.2,isminus=true,isconjugate=true)
+# @show ψ1(0.5,.2)
+# @show ψ1(0.5,.2,isconjugate=true)
+# @show ψ1(0.5,.2,isminus=true)
+# @show ψ1(0.5,.2,isminus=true,isconjugate=true)
 
-@show testshift1(0.5,.2)
-@show testshift1(0.5,.2,isconjugate=true)
-@show testshift1(0.5,.2,isminus=true)
-@show testshift1(0.5,.2,LHSisminus=true)
-@show testshift1(0.5,.2,isconjugate=true,isminus=true)
-@show testshift1(0.5,.2,isconjugate=true,LHSisminus=true)
-@show testshift1(0.5,.2,isminus=true,LHSisminus=true)
+# @show testshift1(0.5,.2)
+# @show testshift1(0.5,.2,isconjugate=true)
+# @show testshift1(0.5,.2,isminus=true)
+# @show testshift1(0.5,.2,LHSisminus=true)
+# @show testshift1(0.5,.2,isconjugate=true,isminus=true)
+# @show testshift1(0.5,.2,isconjugate=true,LHSisminus=true)
+# @show testshift1(0.5,.2,isminus=true,LHSisminus=true)
 
 
 
