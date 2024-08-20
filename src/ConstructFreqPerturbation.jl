@@ -20,44 +20,19 @@ function Compute𝒞plus(ψ::QuasinormalModeFunction,Dplus)
 end
 
 function Computeγs(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,IminusInt,Dplus,m,ω)
-    # denom=(2*((-1)^m * Dplus*HplusInt*∂ωOminusInt- 12*im*IplusInt*∂ωOminusInt*ω))
-    # γ1num=(-(-1)^m*Dplus*IminusInt*∂ωOplusInt + 12*im*HplusInt*∂ωOminusInt*ω - 
-    #     IplusInt*∂ωOminusInt*(-1)^m*Dplus + 12*im*HminusInt*∂ωOplusInt*ω+
-    #     sqrt(-4*(-12*im*IminusInt*∂ωOplusInt*ω+ HminusInt*∂ωOplusInt*(-1)^m
-    #     *Dplus)*((-1)^m*Dplus* HplusInt*∂ωOminusInt- 12*im*IplusInt*∂ωOminusInt
-    #     *ω) + ((-1)^m * Dplus*IminusInt*∂ωOplusInt - 12*im*HplusInt*∂ωOminusInt
-    #     *ω + IplusInt*∂ωOminusInt*(-1)^m*Dplus-12*im*HminusInt*∂ωOplusInt*ω)^2))
-    # γ1=γ1num/denom
-    # γ2num=(-(-1)^m*Dplus*IminusInt*∂ωOplusInt + 12*im*HplusInt*∂ωOminusInt*ω - 
-    #     IplusInt*∂ωOminusInt*(-1)^m*Dplus + 12*im*HminusInt*∂ωOplusInt*ω-
-    #     sqrt(-4*(-12*im*IminusInt*∂ωOplusInt*ω+ HminusInt*∂ωOplusInt*(-1)^m
-    #     *Dplus)*((-1)^m*Dplus* HplusInt*∂ωOminusInt-12*im*IplusInt*∂ωOminusInt
-    #     *ω) + ((-1)^m * Dplus*IminusInt*∂ωOplusInt - 12*im*HplusInt*∂ωOminusInt
-    #     *ω + IplusInt*∂ωOminusInt*(-1)^m*Dplus-12*im*HminusInt*∂ωOplusInt*ω)^2))
-    denom=(2*(Dplus*HplusInt*∂ωOminusInt- 12*im*IplusInt*∂ωOminusInt*ω))
-    γ1num=(-Dplus*IminusInt*∂ωOplusInt + 12*im*HplusInt*∂ωOminusInt*ω - 
-        IplusInt*∂ωOminusInt*Dplus + 12*im*HminusInt*∂ωOplusInt*ω+
-        sqrt(-4*(-12*im*IminusInt*∂ωOplusInt*ω+ HminusInt*∂ωOplusInt*
-        Dplus)*(Dplus* HplusInt*∂ωOminusInt- 12*im*IplusInt*∂ωOminusInt*
-        ω) + ( Dplus*IminusInt*∂ωOplusInt - 12*im*HplusInt*∂ωOminusInt*
-        ω + IplusInt*∂ωOminusInt*Dplus-12*im*HminusInt*∂ωOplusInt*ω)^2))
-    γ1=γ1num/denom
-    γ2num=(-Dplus*IminusInt*∂ωOplusInt + 12*im*HplusInt*∂ωOminusInt*ω - 
-        IplusInt*∂ωOminusInt*Dplus + 12*im*HminusInt*∂ωOplusInt*ω-
-        sqrt(-4*(-12*im*IminusInt*∂ωOplusInt*ω+ HminusInt*∂ωOplusInt*
-        Dplus)*(Dplus* HplusInt*∂ωOminusInt-12*im*IplusInt*∂ωOminusInt*
-        ω) + (Dplus*IminusInt*∂ωOplusInt - 12*im*HplusInt*∂ωOminusInt*
-        ω + IplusInt*∂ωOminusInt*Dplus-12*im*HminusInt*∂ωOplusInt*ω)^2))
-    γ2=γ2num/denom
+    a=Dplus*HplusInt*∂ωOminusInt-12*im*ω*IplusInt*∂ωOminusInt
+    b=Dplus*(IplusInt*∂ωOminusInt+IminusInt*∂ωOplusInt)-12*im*ω*(HplusInt*∂ωOminusInt+HminusInt*∂ωOplusInt)
+    c=Dplus*HminusInt*∂ωOplusInt-12*im*ω*IminusInt*∂ωOplusInt
+    γ1=(-b+sqrt(b^2-4*a*c))/(2*a)
+    γ2=(-b-sqrt(b^2-4*a*c))/(2*a)
     γs=(γ1,γ2)
     println("γs: ", γs)
     γs
 end
 
+
 function ComputeAs(𝒞plus,Dplus,ψ::QuasinormalModeFunction,γs)
-    m=ψ.m;ω=ψ.ω;
-    # A1=8((-1)^m*Dplus*γs[1]-12*im*ω)/𝒞plus
-    # A2=8((-1)^m*Dplus*γs[2]-12*im*ω)/𝒞plus
+    ω=ψ.ω;
     A1=8(Dplus*γs[1]-12*im*ω)/𝒞plus
     A2=8(Dplus*γs[2]-12*im*ω)/𝒞plus
     As=(A1,A2)
@@ -65,9 +40,7 @@ function ComputeAs(𝒞plus,Dplus,ψ::QuasinormalModeFunction,γs)
 end
 
 function ComputeBs(𝒞plus,Dplus,ψ::QuasinormalModeFunction,γs)
-    m=ψ.m;ω=ψ.ω;
-    # B1=8((-1)^m*conj(Dplus)+12*im*conj(ω)*conj(γs[1]))/conj(𝒞plus)
-    # B2=8((-1)^m*conj(Dplus)+12*im*conj(ω)*conj(γs[2]))/conj(𝒞plus)
+    ω=ψ.ω;
     B1=8(conj(Dplus)+12*im*conj(ω)*conj(γs[1]))/conj(𝒞plus)
     B2=8(conj(Dplus)+12*im*conj(ω)*conj(γs[2]))/conj(𝒞plus)
     Bs=(B1,B2)
@@ -76,7 +49,6 @@ end
 
 function Computeω2(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,IminusInt,ψ)
     Dplus=ComputeDplus(ψ)
-    # println(Dplus)
     𝒞plus= Compute𝒞plus(ψ,Dplus)
     γs=Computeγs(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,IminusInt,Dplus,ψ.m,ψ.ω)
     As=ComputeAs(𝒞plus,Dplus,ψ,γs)
