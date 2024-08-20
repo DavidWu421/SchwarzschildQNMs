@@ -5,6 +5,7 @@ push!(LOAD_PATH, "C:/Users/dwuuu/Documents/GitHub/KerrQuasinormalModes.jl")
 
 using ContourIntegrals
 using KerrQNMShifts
+using KerrQuasinormalModes
 
 
 ### Use expressions for the operators, noted in their respective csvs
@@ -19,25 +20,90 @@ filetest="C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/Sa
 
 testshift = OperatorShift(filetest)
 
-# ∂ωOplus = OperatorShift(file1)
+∂ωOplus = OperatorShift(file1)
 # ∂ωOminus= OperatorShift(file2)
 # Hplus = OperatorShift(file3)
 # Hminus = OperatorShift(file4)
 # Iplus = OperatorShift(file5)
 # Iminus = OperatorShift(file6)
 
-ψ1 = qnmfunctionnew(-2,2,2,0,0.5)
-ψ2 = qnmfunctionnew(-2,2,2,0,0.5,modesign="minus")
-ψ3 = qnmfunctionnew(2,2,2,0,0.5)
-# ψ2 = qnmfunctionnew(-2,2,2,0,0.0)
-# ψ3 = qnmfunctionnew(-2,2,2,0,0.0000001)
+ψ1 = qnmfunctionnew(-2,5,3,0,0.5)
+ψ2= qnmfunctionnew(-2,5,3,0,0.5,modesign="minus")
+
+η1=ψ1.R.η
+α1=ψ1.R.α
+ξ1=ψ1.R.ξ
+ζ1=ψ1.R.ζ
+r₊1=ψ1.R.r₊
+r₋1=ψ1.R.r₋
+
+η2=ψ2.R.η
+α2=ψ2.R.α
+ξ2=ψ2.R.ξ
+ζ2=ψ2.R.ζ
+r₊2=ψ2.R.r₊
+r₋2=ψ2.R.r₋
+
+r0=10
+z0=0.2
+
+# @show L4(ψ1,r0,z0)/ψ1.R(r0)/ψ3.S(z0)
+# ComputeDplus(ψ1)
+
+# # Check the derivative functions
+# δr=.000001
+# δz=.00001
+# @show ∂r(ψ1.R)(r)-(ψ1.R(r+δr)-ψ1.R(r))/δr
+# @show ∂r(ψ1)(r,z)-(ψ1(r+δr,z)-ψ1(r,z))/δr
+# @show ∂r(∂r(ψ1))(r,z)-(ψ1(r+δr,z)-2*ψ1(r,z)+ψ1(r-δr,z))/δr^2
+
+# @show ∂θ(ψ1.S)(z)-(ψ1.S(z+δz)-ψ1.S(z))/δz*(-sqrt(1-z^2))
+# @show ∂θ(ψ1)(r,z)-(ψ1(r,z+δz)-ψ1(r,z))/δz*(-sqrt(1-z^2))
+# @show ∂θ(∂θ(ψ1))(r,z)-(ψ1(r,z+δz)-2*ψ1(r,z)+ψ1(r,z-δz))/δz^2*(1-z^2)-(ψ1(r,z+δz)-ψ1(r,z))/δz*(-z)
+
+# @show ∂r(∂θ(ψ1))(r,z)-(ψ1(r+δr,z+δz)-ψ1(r+δr,z)-ψ1(r,z+δz)+ψ1(r,z))/(δr*δz)*(-sqrt(1-z^2))
+
+
+
+@show c1=Complex(-1)^(α1-η1-ξ1)
+
+# function c2(r)
+#     im^(α1-η1-ξ1)*exp(-(1/2)*im*(π*(-α1+η1+ξ1)+2*(-α1+η1)*angle(r-r₋1)+2*ξ1*angle(r-r₊1)))*(r-r₋1)^(α1-η1)*((r-r₋1)^2)^(1/2*(-α1+η1))*(r-r₊1)^(-ξ1)*((r-r₊1)^2)^(ξ1/2)
+# end
+function c2(r)
+    (im*(r₋1-r))^(η1-α1)*(im*(r₊1-r))^ξ1/((im*(r-r₋1))^(η1-α1)*(im*(r-r₊1))^ξ1)
+end
+@show c2(r0)
+
+@show exp(im*π*(α1-η1-3*ξ1))*(r0-r₋1)^(α1-η1)*sqrt(Complex((r0-r₋1)^(-2*α1+2*η1)))*(-r0+r₊1)^(-ξ1)*sqrt(Complex((-r0+r₊1)^(2*ξ1)))
+# @show ψ1(r0)
+# @show ψ1(r0,z0)
+
+# @show ψ1.R(r)
+# @show ψ2.R(r)
+# @show ψ1.R(r)*c
+# @show conj(ψ2.R(r))
+
 
 # weight = let s = ψ1.s , a= ψ1.a
 #     (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
 # end
 
-# testshifts1=OperatorSandwich(ψ1,testshift,weight,ψ1)
-# testshift1 = testshifts1.Op;
+# println("Past weight")
+
+# testshifts11=OperatorSandwich(ψ1,testshift,weight,ψ1)
+# testshift11 = testshifts11.Op;
+
+# println("Past testshift11")
+
+# testshifts21=OperatorSandwich(ψ2,testshift,weight,ψ1)
+# testshift21 = testshifts21.Op;
+
+# testshifts12=OperatorSandwich(ψ1,testshift,weight,ψ2)
+# testshift12 = testshifts12.Op;
+
+# testshifts22=OperatorSandwich(ψ2,testshift,weight,ψ2)
+# testshift22 = testshifts22.Op;
 
 # ∂ωOpluss1 = OperatorSandwich(ψ1,∂ωOplus,weight,ψ1)
 # ∂ωOplus1 = ∂ωOpluss1.Op;
@@ -62,18 +128,20 @@ testshift = OperatorShift(filetest)
 # @show ψ1(0.5,.2,isminus=true)
 # @show ψ1(0.5,.2,isminus=true,isconjugate=true)
 
-# @show testshift1(0.5,.2)
-# @show testshift1(0.5,.2,isconjugate=true)
-# @show testshift1(0.5,.2,isminus=true)
-# @show testshift1(0.5,.2,LHSisminus=true)
-# @show testshift1(0.5,.2,isconjugate=true,isminus=true)
-# @show testshift1(0.5,.2,isconjugate=true,LHSisminus=true)
-# @show testshift1(0.5,.2,isminus=true,LHSisminus=true)
+# @show testshift11(r,z)
+# @show testshift11(r,z,isconjugate=true)
+# @show testshift21(r,z,isconjugate=true)
+# @show testshift21(r,z)
+# @show testshift12(r,z)
+# @show testshift12(r,z,isconjugate=true)
+# @show testshift22(r,z)
+# @show testshift22(r,z,isconjugate=true)
 
 
 
 
-# @show ∂ωOplus1(0.5,.2)
+
+# @show ∂ωOplus1(r,z)
 # @show ∂ωOplus1(0.5,.2,isconjugate=true)
 # @show ∂ωOplus1(0.5,.2,isminus=true)
 # @show ∂ωOplus1(0.5,.2,LHSisminus=true)
@@ -210,34 +278,9 @@ testshift = OperatorShift(filetest)
 # ℐminus3= conj(Integrate(Iminus3, TheContour,isconjugate=true,LHSisminus=true)[1])
 # println("Done Iminus")
 
-# println("R's")
-# println(ψ.R(1))
-# println(ψ.R(1;isconjugate=true))
-# println(ψ.R(1;isminus=true))
-# println(ψ.R(1;isconjugate=true,isminus=true))
-
-
-# println("S's")
-# println(ψ.S(0))
-# println(ψ.S(0,isconjugate=true))
-# println(ψ.S(0,isminus=true))
-
-# println("Full funcs")
-# println(ψ(1,0))
-# println(ψ(1,0,isconjugate=true))
-# println(ψ(1,0,isminus=true))
-# println(ψ(1,0,isconjugate=true,isminus=true))
-
-# println("ψ2.S")
-# ψ2 = qnmfunctionnew(2,2,2,0,0.5)
-# println("ψ2.S(0): ", ψ2.S(0))
 
 # ∂ωOminus=OperatorShift(file2)
 # ∂ωOplus=OperatorShift(file1)
-
-# weight = let s = ψ.s , a= ψ.a
-#     (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
-# end
 
 # ∂ωOminuss = OperatorSandwich(ψ,∂ωOminus,weight,ψ)
 # ∂ωOminus = ∂ωOminuss.Op;
@@ -247,33 +290,10 @@ testshift = OperatorShift(filetest)
 
 # @show ∂ωOminus(1.0,0.0)
 
-# ### Define the useful contours
-# r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
-
-# point1 = r₊ + Δr - Δr*im
-# point2 = r₊ - Δr - Δr*im
-
-# radial1 = SemiInfiniteLine(point1 , point1 + Δr*im , false)
-# angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
-# C1 = radial1 ⊗ angular
-
-# radial2 = LineSegment(point1,point2,true)
-# C2 = radial2 ⊗ angular
-
-# radial3 = SemiInfiniteLine(point2 , point2 + Δr*im , true)
-# C3 = radial3 ⊗ angular
-
-# TheContour = C1⊕C2⊕C3
-
 # println(Integrate(∂ωOminus, TheContour))
 
 # qnmfunctionnew(s,l,m,n,a; qnm=qnm)
 
-
-
-# weight = let s = ψ.s , a= ψ.a
-#     (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
-# end
 
 # println("omega:", ψ.ω)
 
@@ -339,21 +359,3 @@ testshift = OperatorShift(filetest)
 # Hminus(2.2,0.1) |> println
 # Iplus(2.2,0.1) |> println
 # Iminus(2.2,0.1) |> println
-
-# ### Define the useful contours
-# r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
-
-# point1 = r₊ + Δr - Δr*im
-# point2 = r₊ - Δr - Δr*im
-
-# radial1 = SemiInfiniteLine(point1 , point1 + Δr*im , false)
-# angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
-# C1 = radial1 ⊗ angular
-
-# radial2 = LineSegment(point1,point2,true)
-# C2 = radial2 ⊗ angular
-
-# radial3 = SemiInfiniteLine(point2 , point2 + Δr*im , true)
-# C3 = radial3 ⊗ angular
-
-# TheContour = C1⊕C2⊕C3

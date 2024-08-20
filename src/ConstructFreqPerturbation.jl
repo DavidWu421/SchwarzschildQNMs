@@ -6,10 +6,9 @@ end
 function ComputeDplus(ψ::QuasinormalModeFunction)
     Alm=ψ.Alm; a=ψ.a; m=ψ.m; ω=ψ.ω;
     λlm=Alm+a^2*ω^2-2*a*m*ω
-    D²=λlm^2*(λlm+2)^2-8*λlm*(5*λlm+6)*(a^2*ω^2-a*m*ω)+96*λlm*a^2*ω^2
-        +144*(a^2*ω^2-a*m*ω)^2
+    D²=λlm^2*(λlm+2)^2-8*λlm*(5*λlm+6)*(a^2*ω^2-a*m*ω)+96*λlm*a^2*ω^2+
+        144*(a^2*ω^2-a*m*ω)^2
     Dplus=sqrt(D²)
-    println("Dplus: ", Dplus)
     Dplus
 end
 
@@ -38,17 +37,17 @@ function Computeγs(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     denom=(2*(Dplus*HplusInt*∂ωOminusInt- 12*im*IplusInt*∂ωOminusInt*ω))
     γ1num=(-Dplus*IminusInt*∂ωOplusInt + 12*im*HplusInt*∂ωOminusInt*ω - 
         IplusInt*∂ωOminusInt*Dplus + 12*im*HminusInt*∂ωOplusInt*ω+
-        sqrt(-4*(-12*im*IminusInt*∂ωOplusInt*ω+ HminusInt*∂ωOplusInt
-        *Dplus)*(Dplus* HplusInt*∂ωOminusInt- 12*im*IplusInt*∂ωOminusInt
-        *ω) + ( Dplus*IminusInt*∂ωOplusInt - 12*im*HplusInt*∂ωOminusInt
-        *ω + IplusInt*∂ωOminusInt*Dplus-12*im*HminusInt*∂ωOplusInt*ω)^2))
+        sqrt(-4*(-12*im*IminusInt*∂ωOplusInt*ω+ HminusInt*∂ωOplusInt*
+        Dplus)*(Dplus* HplusInt*∂ωOminusInt- 12*im*IplusInt*∂ωOminusInt*
+        ω) + ( Dplus*IminusInt*∂ωOplusInt - 12*im*HplusInt*∂ωOminusInt*
+        ω + IplusInt*∂ωOminusInt*Dplus-12*im*HminusInt*∂ωOplusInt*ω)^2))
     γ1=γ1num/denom
     γ2num=(-Dplus*IminusInt*∂ωOplusInt + 12*im*HplusInt*∂ωOminusInt*ω - 
         IplusInt*∂ωOminusInt*Dplus + 12*im*HminusInt*∂ωOplusInt*ω-
-        sqrt(-4*(-12*im*IminusInt*∂ωOplusInt*ω+ HminusInt*∂ωOplusInt
-        *Dplus)*(Dplus* HplusInt*∂ωOminusInt-12*im*IplusInt*∂ωOminusInt
-        *ω) + (Dplus*IminusInt*∂ωOplusInt - 12*im*HplusInt*∂ωOminusInt
-        *ω + IplusInt*∂ωOminusInt*Dplus-12*im*HminusInt*∂ωOplusInt*ω)^2))
+        sqrt(-4*(-12*im*IminusInt*∂ωOplusInt*ω+ HminusInt*∂ωOplusInt*
+        Dplus)*(Dplus* HplusInt*∂ωOminusInt-12*im*IplusInt*∂ωOminusInt*
+        ω) + (Dplus*IminusInt*∂ωOplusInt - 12*im*HplusInt*∂ωOminusInt*
+        ω + IplusInt*∂ωOminusInt*Dplus-12*im*HminusInt*∂ωOplusInt*ω)^2))
     γ2=γ2num/denom
     γs=(γ1,γ2)
     println("γs: ", γs)
