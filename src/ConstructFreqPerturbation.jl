@@ -14,7 +14,7 @@ end
 
 function Compute𝒞plus(ψ::QuasinormalModeFunction,Dplus)
     ω=ψ.ω;
-    𝒞plus=Dplus+144*ω^2
+    𝒞plus=Dplus^2+144*ω^2
     println("𝒞plus: ", 𝒞plus)
     𝒞plus
 end
@@ -54,8 +54,8 @@ function Computeω2(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     As=ComputeAs(𝒞plus,Dplus,ψ,γs)
     Bs= ComputeBs(𝒞plus,Dplus,ψ,γs)
 
-    println("Bs: ",Bs)
     println("As: ",As)
+    println("Bs: ",Bs)
     println("numerator: ",(As[1]*HplusInt+conj(Bs[1])IplusInt))
     println("∂ωOplusInt: ",∂ωOplusInt)
 

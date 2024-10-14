@@ -7,10 +7,18 @@ using KerrQNMShifts
 using KerrQuasinormalModes
 using Test
 
-@testset "TeukolskyOperator" begin
+# @testset "TeukolskyOperator" begin
     
     ψ = qnmfunctionnew(-2,2,2,0,0.01)
     ψ0 = qnmfunctionnew(-2,2,2,0,0.)
+
+    ψm = qnmfunctionnew(-2,2,2,0,0.01,modesign="minus")
+    ψ0m = qnmfunctionnew(-2,2,2,0,0.,modesign="minus")
+
+    # ψtest = qnmfunctionnew(2,5,3,0,0.)
+    # ψtest.ω=ψ0.ω
+    # ψtest.a=ψ0.a
+
 
     ω=ψ.ω
     ω0=ψ0.ω
@@ -20,8 +28,12 @@ using Test
     ψ(1,.5)
     println("Past ψ compile")
 
-    weight = let s = ψ0.s , a= ψ0.a
-        (r,z) -> sqrt(1-z^2)*(r^2+a^2-2*r)^s
+    weight0 = let s0 = ψ0.s , a0= ψ0.a
+        (r,z) -> Complex(-1)^(2/3)*Complex(r)^4*(r^2+a0^2*z^2)*sqrt(1-z^2)*(r^2+a0^2-2*r)^s0
+    end
+
+    weight = let s = ψ.s , a= ψ.a
+        (r,z) ->Complex(r-im*a*z)^4*(r^2+a^2*z^2)*sqrt(1-z^2)*(r^2+a^2-2*r)^s
     end
     println("Past weight")
 
@@ -62,52 +74,65 @@ using Test
 
     println("Done Contours")
 
-    ΣOplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/WithSigmaOpluscoefficients.csv"
-    Oplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Opluscoefficients.csv"
-    Ominusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Ominuscoefficients.csv"
-    ΣdwOplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/WithSigmadwOpluscoefficients.csv"
-    dwOplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/dwOpluscoefficients.csv"
-    dwOminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/dwOminuscoefficients.csv"
+    KerrOplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/KerrOcoefficients.csv"
+    Oplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Ocoefficients.csv"
+    dwOplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/dwOcoefficients.csv"
 
-    ΣOplus = OperatorShift(ΣOplusfile)
-    Σ∂ωOplus = OperatorShift(ΣdwOplusfile)
+    KerrOplus = OperatorShift(KerrOplusfile)
+    KerrOminus = OperatorShift(KerrOplusfile)
     Oplus = OperatorShift(Oplusfile)
     ∂ωOplus = OperatorShift(dwOplusfile)
+    Ominus = OperatorShift(Oplusfile)
+    ∂ωOminus = OperatorShift(dwOplusfile)
 
-    ΣOplusKerr = OperatorSandwich(ψ,ΣOplus,weight,ψ).Op
-    ΣOplusSchw = OperatorSandwich(ψ0,ΣOplus,weight,ψ0).Op
-    Σ∂ωOplusSchw = OperatorSandwich(ψ0,Σ∂ωOplus,weight,ψ0).Op
-    OplusKerr = OperatorSandwich(ψ,Oplus,weight,ψ).Op
-    OplusSchw = OperatorSandwich(ψ0,Oplus,weight,ψ0).Op
-    ∂ωOplusSchw = OperatorSandwich(ψ0,∂ωOplus,weight,ψ0).Op
+    println("Made operator shifts")
+
+    KerrOplusKerr = OperatorSandwich(ψ,KerrOplus,weight,ψ).Op
+    KerrOminusKerr = OperatorSandwich(ψm,KerrOminus,weight,ψm).Op
+    # HermiticityTest = OperatorSandwich(ψ0,Oplus,weight0,ψtest).Op
+
+    println("Made the first set of operators")
+    
+    OplusKerr = OperatorSandwich(ψ0,Oplus,weight0,ψ).Op
+    OplusSchw = OperatorSandwich(ψ0,Oplus,weight0,ψ0).Op
+    ∂ωOplusSchw = OperatorSandwich(ψ0,∂ωOplus,weight0,ψ0).Op
+    OminusKerr = OperatorSandwich(ψ0m,Ominus,weight0,ψm).Op
+    OminusSchw = OperatorSandwich(ψ0m,Ominus,weight0,ψ0m).Op
+    ∂ωOminusSchw = OperatorSandwich(ψ0m,∂ωOminus,weight0,ψ0m).Op
 
     println("Made Operators")
 
-    @show ΣOplusKerr(3,0)
-    @show ΣOplusSchw(3,0)
-    @show Σ∂ωOplusSchw(3,0)
+    # @show HermiticityTest(3,0.5)
 
-    @show OplusKerr(3,0)
-    @show OplusSchw(3,0)
-    @show ∂ωOplusSchw(3,0)
+    @show KerrOplusKerr(3,0.5)
+    @show KerrOminusKerr(3,0.5)
+
+    @show OplusKerr(3,0.5)
+    @show OplusSchw(3,0.5)
+    @show ∂ωOplusSchw(3,0.5)
+
+    @show OminusKerr(3,0.5)
+    @show OminusSchw(3,0.5)
+    @show ∂ωOminusSchw(3,0.5)
 
     println("Complied Operators")
+
+    # HermiticityTest = Integrate(HermiticityTest,TheContour0)[1]
+    # @show HermiticityTest
    
-    @show Σ∂ω𝒪plusSchw= Integrate(Σ∂ωOplusSchw, TheContour0)[1]
-    println("Done first integral")
-    @show Σ𝒪plusKerr= Integrate(ΣOplusKerr, TheContour)[1]
-    @show Σ𝒪plusKerr
-    @show ω2*Σ∂ω𝒪plusSchw
-    println("Done WithSigma")
-
-    @show ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour0)[1]
-    println("Done first integral")
-    @show 𝒪plusKerr= Integrate(OplusKerr, TheContour)[1]
+    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour0)[1]
+    𝒪plusKerr= Integrate(OplusKerr, TheContour)[1]
     @show 𝒪plusKerr
+    @show ∂ω𝒪plusSchw
     @show ω2*∂ω𝒪plusSchw
-    
 
-end
+    ∂ω𝒪minusSchw= Integrate(∂ωOminusSchw, TheContour0)[1]
+    𝒪minusKerr= Integrate(OminusKerr, TheContour)[1]
+    @show 𝒪minusKerr
+    @show ∂ω𝒪minusSchw
+    @show -conj(ω2)*∂ω𝒪minusSchw
+    
+# end
 
 # # Random number generator
 # function random_complex(length)
@@ -154,19 +179,41 @@ end
 #     println("Check derivatives")
 #     δ=10^(-6)
 #     for i in 1:10
-#         @assert abs(∂r(₋₂ψ₂₂₀₊)(random_r[i])-(₋₂ψ₂₂₀₊(random_r[i]+δ)-₋₂ψ₂₂₀₊(random_r[i]))/δ^2))<=10^(-8)
-#         @assert abs(∂θ(₋₂ψ₂₂₀₊)(random_r[i],random_z[i])-(₋₂ψ₂₂₀₊(random_r[i],random_z[i]+δ)-₋₂ψ₂₂₀₊(random_r[i],random_z[i]))/δ^2))<=10^(-8)
 
+#         @assert isapprox(∂r(₋₂ψ₂₂₀₊)(random_r[i]), (₋₂ψ₂₂₀₊(random_r[i]+δ)- ₋₂ψ₂₂₀₊(random_r[i]))/δ, rtol=1e-5)
+#         @assert isapprox(∂θ(₋₂ψ₂₂₀₊)(random_r[i],random_z[i]), -sqrt(1-random_z[i]^2)* (₋₂ψ₂₂₀₊(random_r[i],random_z[i]+δ)- ₋₂ψ₂₂₀₊(random_r[i],random_z[i]))/δ, rtol=1e-5)
+        
 #         # Second-order derivative test
-#         finite_diff_2nd_r = (₋₂ψ₂₂₀₊(random_r[i]+δ) - 2*₋₂ψ₂₂₀₊(random_r[i]) + ₋₂ψ₂₂₀₊(random_r[i]-δ)) / δ^2
-#         @assert abs(∂r(∂r(₋₂ψ₂₂₀₊))(random_r[i]) - finite_diff_2nd_r) <= 10^(-8)
+#         finite_diff_2nd_r = (₋₂ψ₂₂₀₊(random_r[i]+δ) - 2*(₋₂ψ₂₂₀₊(random_r[i])) + ₋₂ψ₂₂₀₊(random_r[i]-δ)) / δ^2
+#         @assert isapprox(∂r(∂r(₋₂ψ₂₂₀₊))(random_r[i]), finite_diff_2nd_r, rtol=1e-1)
 
-#         finite_diff_2nd_θ = (₋₂ψ₂₂₀₊(random_r[i],random_z[i]+δ) - 2*₋₂ψ₂₂₀₊(random_r[i],random_z[i]) + ₋₂ψ₂₂₀₊(random_r[i],random_z[i]-δ)) / δ^2
-#         @assert abs(∂r(∂r(₋₂ψ₂₂₀₊))(random_r[i],random_z[i]) - finite_diff_2nd_θ) <= 10^(-8)
+#         finite_diff_2nd_θ = (1-random_z[i]^2)*(₋₂ψ₂₂₀₊(random_r[i],random_z[i]+δ) - 2*(₋₂ψ₂₂₀₊(random_r[i],random_z[i])) + ₋₂ψ₂₂₀₊(random_r[i],random_z[i]-δ)) / δ^2 - random_z[i]*(₋₂ψ₂₂₀₊(random_r[i],random_z[i]+δ)- ₋₂ψ₂₂₀₊(random_r[i],random_z[i]))/δ
+#         @assert isapprox(∂θ(∂θ(₋₂ψ₂₂₀₊))(random_r[i],random_z[i]), finite_diff_2nd_θ, rtol=1e-2)
 
 #         # Mixed derivative test
-#         finite_diff_rθ = (₋₂ψ₂₂₀₊(random_r[i]+δ, random_z[i]+δ) - ₋₂ψ₂₂₀₊(random_r[i]+δ, random_z[i]-δ) - ₋₂ψ₂₂₀₊(random_r[i]-δ, random_z[i]+δ) + ₋₂ψ₂₂₀₊(random_r[i]-δ, random_z[i]-δ)) / (4*δ^2)
-#          @assert abs(∂r(∂θ(₋₂ψ₂₂₀₊))(random_r[i],random_z[i]) - finite_diff_rθ) <= 10^(-8)
+#         finite_diff_rθ = -sqrt(1-random_z[i]^2)*(₋₂ψ₂₂₀₊(random_r[i]+δ, random_z[i]+δ) - ₋₂ψ₂₂₀₊(random_r[i]+δ, random_z[i]-δ) - ₋₂ψ₂₂₀₊(random_r[i]-δ, random_z[i]+δ) + ₋₂ψ₂₂₀₊(random_r[i]-δ, random_z[i]-δ)) / (4*δ^2)
+#         @assert isapprox(∂r(∂θ(₋₂ψ₂₂₀₊))(random_r[i],random_z[i]), finite_diff_rθ, rtol=1e-3)
+#         @assert isapprox(∂θ(∂r(₋₂ψ₂₂₀₊))(random_r[i],random_z[i]), finite_diff_rθ, rtol=1e-3)
+
+
+#         #Minus mode derivatives
+
+#         @assert isapprox(∂r(₋₂ψ₂₂₀₋)(random_r[i]), (₋₂ψ₂₂₀₋(random_r[i]+δ)- ₋₂ψ₂₂₀₋(random_r[i]))/δ, rtol=1e-5)
+#         @assert isapprox(∂θ(₋₂ψ₂₂₀₋)(random_r[i],random_z[i]), -sqrt(1-random_z[i]^2)* (₋₂ψ₂₂₀₋(random_r[i],random_z[i]+δ)- ₋₂ψ₂₂₀₋(random_r[i],random_z[i]))/δ, rtol=1e-4)
+        
+#         # Second-order derivative test
+#         finite_diff_2nd_r = (₋₂ψ₂₂₀₋(random_r[i]+δ) - 2*(₋₂ψ₂₂₀₋(random_r[i])) + ₋₂ψ₂₂₀₋(random_r[i]-δ)) / δ^2
+#         @assert isapprox(∂r(∂r(₋₂ψ₂₂₀₋))(random_r[i]), finite_diff_2nd_r, rtol=1e-1)
+
+#         finite_diff_2nd_θ = (1-random_z[i]^2)*(₋₂ψ₂₂₀₋(random_r[i],random_z[i]+δ) - 2*(₋₂ψ₂₂₀₋(random_r[i],random_z[i])) + ₋₂ψ₂₂₀₋(random_r[i],random_z[i]-δ)) / δ^2 - random_z[i]*(₋₂ψ₂₂₀₋(random_r[i],random_z[i]+δ)- ₋₂ψ₂₂₀₋(random_r[i],random_z[i]))/δ
+#         @assert isapprox(∂θ(∂θ(₋₂ψ₂₂₀₋))(random_r[i],random_z[i]), finite_diff_2nd_θ, rtol=1e-2)
+
+#         # Mixed derivative test
+#         finite_diff_rθ = -sqrt(1-random_z[i]^2)*(₋₂ψ₂₂₀₋(random_r[i]+δ, random_z[i]+δ) - ₋₂ψ₂₂₀₋(random_r[i]+δ, random_z[i]-δ) - ₋₂ψ₂₂₀₋(random_r[i]-δ, random_z[i]+δ) + ₋₂ψ₂₂₀₋(random_r[i]-δ, random_z[i]-δ)) / (4*δ^2)
+#         @assert isapprox(∂r(∂θ(₋₂ψ₂₂₀₋))(random_r[i],random_z[i]), finite_diff_rθ, rtol=1e-3)
+#         @assert isapprox(∂θ(∂r(₋₂ψ₂₂₀₋))(random_r[i],random_z[i]), finite_diff_rθ, rtol=1e-3)
+
+         
 
 #     end
   
