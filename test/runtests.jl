@@ -7,6 +7,31 @@ using KerrQNMShifts
 using KerrQuasinormalModes
 using Test
 
+function compute_derivative_matrix(ψ, r, θ)
+    # Initialize a 5x5 matrix to hold the derivatives
+    derivatives = Matrix{ComplexF64}(undef, 5, 5)
+    for i in 0:4
+        for j in 0:4
+            temp_ψ = ψ
+            for _ in 1:i
+                temp_ψ = ∂r(temp_ψ)
+            end
+            for _ in 1:j
+                temp_ψ = ∂θ(temp_ψ)
+            end
+            derivatives[i+1, j+1] = temp_ψ(r, θ)
+        end
+    end
+    
+    return derivatives
+end
+
+function matrix_to_mathematica_format(matrix)
+    # Convert the matrix to a string in Mathematica's List format
+    mat_str = string("{{", join([join([string(el) for el in row], ", ") for row in eachrow(matrix)], "}, {"), "}}")
+    return mat_str
+end
+
 # @testset "TeukolskyOperator" begin
     
     ψ = qnmfunctionnew(-2,2,2,0,0.01)
@@ -15,9 +40,11 @@ using Test
     ψm = qnmfunctionnew(-2,2,2,0,0.01,modesign="minus")
     ψ0m = qnmfunctionnew(-2,2,2,0,0.,modesign="minus")
 
-    # ψtest = qnmfunctionnew(2,5,3,0,0.)
-    # ψtest.ω=ψ0.ω
-    # ψtest.a=ψ0.a
+    ψtest = qnmfunctionnew(2,5,3,0,0.)
+    ψtest.ω=ψ0.ω
+    ψtest.a=ψ0.a
+    ψtest.m=ψ0.m
+    ψtest.s=ψ0.s
 
 
     ω=ψ.ω
@@ -28,12 +55,32 @@ using Test
     ψ(1,.5)
     println("Past ψ compile")
 
-    weight0 = let s0 = ψ0.s , a0= ψ0.a
-        (r,z) -> Complex(-1)^(2/3)*Complex(r)^4*(r^2+a0^2*z^2)*sqrt(1-z^2)*(r^2+a0^2-2*r)^s0
+    Σ = let a= ψ.a
+        (r,z) -> Complex(r)^2+a^2*z^2
+    end
+    Δ = let a= ψ.a
+        (r,z) -> Complex(r)^2+a^2-2*r
+    end
+    ζ = let a= ψ.a
+        (r,z) -> r-im*a*z
     end
 
     weight = let s = ψ.s , a= ψ.a
-        (r,z) ->Complex(r-im*a*z)^4*(r^2+a^2*z^2)*sqrt(1-z^2)*(r^2+a^2-2*r)^s
+        (r,z) ->2^(5+s)*ζ(r,z)^(8+2*s)*Σ(r,z)*sqrt(1-z^2)/((Δ(r,z))^2)
+    end
+
+
+    Σ0 = let a= ψ0.a
+        (r,z) -> Complex(r)^2+a^2*z^2
+    end
+    Δ0 = let a= ψ0.a
+        (r,z) -> Complex(r)^2+a^2-2*r
+    end
+    ζ0 = let a= ψ0.a
+        (r,z) -> r-im*a*z
+    end
+    weight0 = let s = ψ0.s , a= ψ0.a
+        (r,z) ->2^(5+s)*ζ0(r,z)^(8+2*s)*Σ0(r,z)*sqrt(1-z^2)/((Δ0(r,z))^2)
     end
     println("Past weight")
 
@@ -87,50 +134,54 @@ using Test
 
     println("Made operator shifts")
 
-    KerrOplusKerr = OperatorSandwich(ψ,KerrOplus,weight,ψ).Op
-    KerrOminusKerr = OperatorSandwich(ψm,KerrOminus,weight,ψm).Op
-    # HermiticityTest = OperatorSandwich(ψ0,Oplus,weight0,ψtest).Op
+    # KerrOplusKerr = OperatorSandwich(ψ,KerrOplus,weight,ψ).Op
+    # KerrOminusKerr = OperatorSandwich(ψm,KerrOminus,weight,ψm).Op
+    HermiticityTest1 = OperatorSandwich(ψ0,Oplus,weight0,ψtest).Op
+    HermiticityTest2 = OperatorSandwich(ψtest,Oplus,weight0,ψ0).Op
 
-    println("Made the first set of operators")
+    # println("Made the first set of operators")
     
-    OplusKerr = OperatorSandwich(ψ0,Oplus,weight0,ψ).Op
-    OplusSchw = OperatorSandwich(ψ0,Oplus,weight0,ψ0).Op
-    ∂ωOplusSchw = OperatorSandwich(ψ0,∂ωOplus,weight0,ψ0).Op
-    OminusKerr = OperatorSandwich(ψ0m,Ominus,weight0,ψm).Op
-    OminusSchw = OperatorSandwich(ψ0m,Ominus,weight0,ψ0m).Op
-    ∂ωOminusSchw = OperatorSandwich(ψ0m,∂ωOminus,weight0,ψ0m).Op
+    # OplusKerr = OperatorSandwich(ψ0,Oplus,weight0,ψ).Op
+    # OplusSchw = OperatorSandwich(ψ0,Oplus,weight0,ψ0).Op
+    # ∂ωOplusSchw = OperatorSandwich(ψ0,∂ωOplus,weight0,ψ0).Op
+    # OminusKerr = OperatorSandwich(ψ0m,Ominus,weight0,ψm).Op
+    # OminusSchw = OperatorSandwich(ψ0m,Ominus,weight0,ψ0m).Op
+    # ∂ωOminusSchw = OperatorSandwich(ψ0m,∂ωOminus,weight0,ψ0m).Op
 
     println("Made Operators")
 
-    # @show HermiticityTest(3,0.5)
+    @show HermiticityTest1(3,0.5)
+    @show HermiticityTest2(3,0.5)
 
-    @show KerrOplusKerr(3,0.5)
-    @show KerrOminusKerr(3,0.5)
+    # @show KerrOplusKerr(3,0.5)
+    # @show KerrOminusKerr(3,0.5)
 
-    @show OplusKerr(3,0.5)
-    @show OplusSchw(3,0.5)
-    @show ∂ωOplusSchw(3,0.5)
+    # @show OplusKerr(3,0.5)
+    # @show OplusSchw(3,0.5)
+    # @show ∂ωOplusSchw(3,0.5)
 
-    @show OminusKerr(3,0.5)
-    @show OminusSchw(3,0.5)
-    @show ∂ωOminusSchw(3,0.5)
+    # @show OminusKerr(3,0.5)
+    # @show OminusSchw(3,0.5)
+    # @show ∂ωOminusSchw(3,0.5)
 
     println("Complied Operators")
 
-    # HermiticityTest = Integrate(HermiticityTest,TheContour0)[1]
-    # @show HermiticityTest
+    HermiticityTestResult1 = Integrate(HermiticityTest1,TheContour0)[1]
+    @show HermiticityTestResult1
+    HermiticityTestResult2 = Integrate(HermiticityTest2,TheContour0)[1]
+    @show HermiticityTestResult2
    
-    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour0)[1]
-    𝒪plusKerr= Integrate(OplusKerr, TheContour)[1]
-    @show 𝒪plusKerr
-    @show ∂ω𝒪plusSchw
-    @show ω2*∂ω𝒪plusSchw
+    # ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour0)[1]
+    # 𝒪plusKerr= Integrate(OplusKerr, TheContour)[1]
+    # @show 𝒪plusKerr
+    # @show ∂ω𝒪plusSchw
+    # @show ω2*∂ω𝒪plusSchw
 
-    ∂ω𝒪minusSchw= Integrate(∂ωOminusSchw, TheContour0)[1]
-    𝒪minusKerr= Integrate(OminusKerr, TheContour)[1]
-    @show 𝒪minusKerr
-    @show ∂ω𝒪minusSchw
-    @show -conj(ω2)*∂ω𝒪minusSchw
+    # ∂ω𝒪minusSchw= Integrate(∂ωOminusSchw, TheContour0)[1]
+    # 𝒪minusKerr= Integrate(OminusKerr, TheContour)[1]
+    # @show 𝒪minusKerr
+    # @show ∂ω𝒪minusSchw
+    # @show -conj(ω2)*∂ω𝒪minusSchw
     
 # end
 
