@@ -33,16 +33,16 @@ end
 
 function ComputeAs(𝒞plus,Dplus,ψ::QuasinormalModeFunction,γs)
     ω=ψ.ω;
-    A1=8(Dplus*γs[1]-12*im*ω)/𝒞plus
-    A2=8(Dplus*γs[2]-12*im*ω)/𝒞plus
+    A1=16(Dplus*γs[1]-12*im*ω)/𝒞plus
+    A2=16(Dplus*γs[2]-12*im*ω)/𝒞plus
     As=(A1,A2)
     As
 end
 
 function ComputeBs(𝒞plus,Dplus,ψ::QuasinormalModeFunction,γs)
     ω=ψ.ω;
-    B1=8(conj(Dplus)+12*im*conj(ω)*conj(γs[1]))/conj(𝒞plus)
-    B2=8(conj(Dplus)+12*im*conj(ω)*conj(γs[2]))/conj(𝒞plus)
+    B1=16(conj(Dplus)+12*im*conj(ω)*conj(γs[1]))/conj(𝒞plus)
+    B2=16(conj(Dplus)+12*im*conj(ω)*conj(γs[2]))/conj(𝒞plus)
     Bs=(B1,B2)
     Bs
 end
