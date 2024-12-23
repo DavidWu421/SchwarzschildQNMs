@@ -36,94 +36,11 @@ end
 
 println("Done deriv funcs")
 
-@testset "TeukolskyOperator Hermiticity" begin
-    ψ = qnmfunctionnew(-2,2,2,0,0.0)
-    ψm = qnmfunctionnew(-2,2,2,0,0.0,modesign="minus")
-
-    ψtest = qnmfunctionnew(2,5,3,0,0.0)
-    ψtest.ω=ψ.ω
-    ψtest.a=ψ.a
-    ψtest.m=ψ.m
-    ψtest.s=ψ.s
-
-    ψtestm = qnmfunctionnew(2,5,3,0,0.0,modesign="minus")
-    ψtestm.ω=ψm.ω
-    ψtestm.a=ψm.a
-    ψtestm.m=ψm.m
-    ψtestm.s=ψm.s
-
-    Σ = let a= ψ.a
-        (r,z) -> Complex(r)^2+a^2*z^2
-    end
-    Δ = let a= ψ.a
-        (r,z) -> Complex(r)^2+a^2-2*r
-    end
-    ζ = let a= ψ.a
-        (r,z) -> r-im*a*z
-    end
-
-    weightplus = let a= ψ.a
-        (r,z) ->8*ζ(r,z)^(4)*Σ(r,z)/((Δ(r,z))^2)
-    end
-    weightminus = let a= ψ.a
-        (r,z) ->8*ζ(conj(r),z)^(4)*Σ(conj(r),z)/((Δ(conj(r),z))^2)
-    end
-
-     ## Define the useful contours
-     r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
-
-     point1 = r₊ + Δr - Δr*im
-     point2 = r₊ - Δr - Δr*im
- 
-     radial1 = SemiInfiniteLine(point1 , point1 + Δr*im , false)
-     angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
-     C1 = radial1 ⊗ angular
- 
-     radial2 = LineSegment(point1,point2,true)
-     C2 = radial2 ⊗ angular
- 
-     radial3 = SemiInfiniteLine(point2 , point2 + Δr*im , true)
-     C3 = radial3 ⊗ angular
- 
-     TheContour = C1⊕C2⊕C3
-
-    Oplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Opluscoefficients.csv"
-    Ominusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Ominuscoefficients.csv"
-    Oplus = OperatorShift(Oplusfile)
-    Ominus = OperatorShift(Ominusfile)
-
-    OplusHermiticity1 = OperatorSandwich(ψ,Oplus,weightplus,ψtest).Op
-    OplusHermiticity2 = OperatorSandwich(ψtest,Oplus,weightplus,ψ).Op
-    OminusHermiticity1 = OperatorSandwich(ψm,Ominus,weightminus,ψtestm).Op
-    OminusHermiticity2= OperatorSandwich(ψtestm,Ominus,weightminus,ψm).Op
-
-    @show OplusHermiticity2(3+im,0.5)
-    @show OplusHermiticity1(3+im,0.5) 
-    @show OminusHermiticity1(3+im,0.5)
-    @show OminusHermiticity2(3+im,0.5)
-
-    @show 𝒪plusHermiticity1= Integrate(OplusHermiticity1, TheContour)[1]
-    @show 𝒪plusHermiticity2= Integrate(OplusHermiticity2, TheContour)[1]
-    @show 𝒪minusHermiticity1= Integrate(OplusHermiticity1, TheContour)[1]
-    @show 𝒪minusHermiticity2= Integrate(OplusHermiticity2, TheContour)[1]
-
-end
-
-# @testset "TeukolskyOperator" begin
+# @testset "KerrAsPertub" begin
     
-    ψ = qnmfunctionnew(-2,2,2,0,0.1)
-    ψ0 = qnmfunctionnew(-2,2,2,0,0.)
+    ψ = qnmfunctionnew(-2,2,2,0,0.)
 
-    ψm = qnmfunctionnew(-2,2,2,0,0.1,modesign="minus")
-    ψ0m = qnmfunctionnew(-2,2,2,0,0.,modesign="minus")
-
-    ω2=ψ.ω-ψ0.ω
-
-    ψtest = qnmfunctionnew(2,5,3,0,0.)
-    ψtest.ω=ψ0.ω
-    ψtest.a=ψ0.a
-    ψtest.m=ψ0.m
-    ψtest.s=ψ0.s
+    ψm = qnmfunctionnew(-2,2,2,0,0.,modesign="minus")
 
     # Compile ψ
     ψ(1,.5)
@@ -146,23 +63,6 @@ end
     weightminus = let a= ψ.a
         (r,z) ->8*ζ(conj(r),z)^(4)*Σ(conj(r),z)/((Δ(conj(r),z))^2)
     end
-
-
-    Σ0 = let a= ψ0.a
-        (r,z) -> Complex(r)^2+a^2*z^2
-    end
-    Δ0 = let a= ψ0.a
-        (r,z) -> Complex(r)^2+a^2-2*r
-    end
-    ζ0 = let a= ψ0.a
-        (r,z) -> r-im*a*z
-    end
-    weight0plus = let a= ψ0.a
-        (r,z) ->8*ζ0(r,z)^(4)*Σ0(r,z)/((Δ0(r,z))^2)
-    end
-    weight0minus = let a= ψ0.a
-        (r,z) ->8*ζ0(conj(r),z)^(4)*Σ0(conj(r),z)/((Δ0(conj(r),z))^2)
-    end
     println("Past weight")
 
     ## Define the useful contours
@@ -182,90 +82,303 @@ end
     C3 = radial3 ⊗ angular
 
     TheContour = C1⊕C2⊕C3
-
-    r₊0 = ψ0.R.r₊ ; r₋0 = ψ0.R.r₋ ; s0 = ψ0.s ; Δr0 = 0.1*(r₊0-r₋0); ϵ = eps(0.1);
-
-    point10 = r₊0 + Δr0 - Δr0*im
-    point20 = r₊0 - Δr0 - Δr0*im
-
-    radial10 = SemiInfiniteLine(point10 , point10 + Δr0*im , false)
-    angular0 = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
-    C10 = radial10 ⊗ angular0
-
-    radial20 = LineSegment(point10,point20,true)
-    C20 = radial20 ⊗ angular0
-
-    radial30 = SemiInfiniteLine(point20 , point20 + Δr0*im , true)
-    C30 = radial30 ⊗ angular0
-
-    TheContour0 = C10⊕C20⊕C30
-
     println("Done Contours")
 
-    KerrOplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/KerrOpluscoefficients.csv"
-    Oplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Opluscoefficients.csv"
     dwOplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/dwOpluscoefficients.csv"
-    KerrOminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/KerrOminuscoefficients.csv"
-    Ominusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Ominuscoefficients.csv"
     dwOminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/dwOminuscoefficients.csv"
+    Hplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Hpluscoefficients.csv"
+    Hminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Hminuscoefficients.csv"
+    Iplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Ipluscoefficients.csv"
+    Iminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Iminuscoefficients.csv"
 
-    KerrOplus = OperatorShift(KerrOplusfile)
-    KerrOminus = OperatorShift(KerrOminusfile)
-    Oplus = OperatorShift(Oplusfile)
     ∂ωOplus = OperatorShift(dwOplusfile)
-    Ominus = OperatorShift(Ominusfile)
     ∂ωOminus = OperatorShift(dwOminusfile)
+    Hplus = OperatorShift(Hplusfile)
+    Hminus = OperatorShift(Hminusfile)
+    Iplus = OperatorShift(Iplusfile)
+    Iminus = OperatorShift(Iminusfile)
 
     println("Made operator shifts")
-
-    KerrOplusKerr = OperatorSandwich(ψ,KerrOplus,weightplus,ψ).Op
-    KerrOminusKerr = OperatorSandwich(ψm,KerrOminus,weightminus,ψm).Op
-    # HermiticityTest1 = OperatorSandwich(ψ0,Oplus,weight0,ψtest).Op
-    # HermiticityTest2 = OperatorSandwich(ψtest,Oplus,weight0,ψ0).Op
-
-    println("Made the first set of operators")
     
-    OplusKerr = OperatorSandwich(ψ0,Oplus,weight0plus,ψ).Op
-    OplusSchw = OperatorSandwich(ψ0,Oplus,weight0plus,ψ0).Op
-    ∂ωOplusSchw = OperatorSandwich(ψ0,∂ωOplus,weight0plus,ψ0).Op
-    OminusKerr = OperatorSandwich(ψ0m,Ominus,weight0minus,ψm).Op
-    OminusSchw = OperatorSandwich(ψ0m,Ominus,weight0minus,ψ0m).Op
-    ∂ωOminusSchw = OperatorSandwich(ψ0m,∂ωOminus,weight0minus,ψ0m).Op
+    ∂ωOplusSchw = OperatorSandwich(ψ,∂ωOplus,weightplus,ψ).Op
+    ∂ωOminusSchw = OperatorSandwich(ψm,∂ωOminus,weightminus,ψm).Op
+    HplusSchw = OperatorSandwich(ψ,Hplus,weightplus,ψ).Op
+    HminusSchw = OperatorSandwich(ψm,Hminus,weightminus,ψm).Op
+    IminusSchw = OperatorSandwich(ψm,Iminus,weightminus,ψ).Op
+    IplusSchw = OperatorSandwich(ψ,Iplus,weightplus,ψm).Op
 
     println("Made Operators")
 
-    # @show HermiticityTest1(3,0.5)
-    # @show HermiticityTest2(3,0.5)
-
-    @show KerrOplusKerr(3+im,0.5)
-    @show KerrOminusKerr(3+im,0.5)
-
-    @show OplusKerr(3+im,0.5)
-    @show OplusSchw(3+im,0.5)
     @show ∂ωOplusSchw(3+im,0.5)
-
-    @show OminusKerr(3+im,0.5)
-    @show OminusSchw(3+im,0.5)
     @show ∂ωOminusSchw(3+im,0.5)
+    @show HplusSchw(3+im,0.5)
+    @show HminusSchw(3+im,0.5)
+    @show IminusSchw(3+im,0.5)
+    @show IplusSchw(3+im,0.5)
 
     println("Complied Operators")
 
-    # HermiticityTestResult1 = Integrate(HermiticityTest1,TheContour0)[1]
-    # @show HermiticityTestResult1
-    # HermiticityTestResult2 = Integrate(HermiticityTest2,TheContour0)[1]
-    # @show HermiticityTestResult2
-   
-    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour0)[1]
-    𝒪plusKerr= Integrate(OplusKerr, TheContour)[1]
-    @show 𝒪plusKerr
-    @show ∂ω𝒪plusSchw
-    @show ω2*∂ω𝒪plusSchw
+    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour)[1]
+    ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContour)[1])
+    ℋplusSchw= Integrate(HplusSchw, TheContour)[1]
+    ℋminusSchw= conj(Integrate(HminusSchw, TheContour)[1])
+    ℐplusSchw= Integrate(IplusSchw, TheContour, isconjugate = true)[1]
+    ℐminusSchw= conj(Integrate(IminusSchw, TheContour, isconjugate = true)[1])
 
-    ∂ω𝒪minusSchw= Integrate(∂ωOminusSchw, TheContour0)[1]
-    𝒪minusKerr= Integrate(OminusKerr, TheContour)[1]
-    @show 𝒪minusKerr
+    @show ∂ω𝒪plusSchw
     @show ∂ω𝒪minusSchw
-    @show -conj(ω2)*∂ω𝒪minusSchw
+    @show ℋplusSchw
+    @show ℋminusSchw
+    @show ℐplusSchw
+    @show ℐminusSchw 
+    
+    ω2s=Computeω2(∂ω𝒪plusSchw,∂ω𝒪minusSchw,ℋplusSchw,ℋminusSchw,ℐplusSchw,ℐminusSchw,ψ)
+    @show ω2s
+
+# end
+
+# @testset "TeukolskyOperator Hermiticity" begin
+#     ψref = qnmfunctionnew(-2,2,2,0,0.0)
+#     ψrefm = qnmfunctionnew(-2,2,2,0,0.0,modesign="minus")
+
+#     ψ = qnmfunctionnew(-2,4,3,0,0.0)
+#     ψ.ω=ψref.ω
+#     ψ.a=ψref.a
+#     ψ.m=ψref.m
+#     ψ.s=ψref.s
+
+#     ψm = qnmfunctionnew(-2,4,3,0,0.0,modesign="minus")
+#     ψm.ω=ψrefm.ω
+#     ψm.a=ψrefm.a
+#     ψm.m=ψrefm.m
+#     ψm.s=ψrefm.s
+
+#     ψtest = qnmfunctionnew(2,5,3,0,0.0)
+#     ψtest.ω=ψref.ω
+#     ψtest.a=ψref.a
+#     ψtest.m=ψref.m
+#     ψtest.s=ψref.s
+
+#     ψtestm = qnmfunctionnew(2,5,3,0,0.0,modesign="minus")
+#     ψtestm.ω=ψrefm.ω
+#     ψtestm.a=ψrefm.a
+#     ψtestm.m=ψrefm.m
+#     ψtestm.s=ψrefm.s
+
+#     Σ = let a= ψref.a
+#         (r,z) -> Complex(r)^2+a^2*z^2
+#     end
+#     Δ = let a= ψref.a
+#         (r,z) -> Complex(r)^2+a^2-2*r
+#     end
+#     ζ = let a= ψref.a
+#         (r,z) -> r-im*a*z
+#     end
+
+#     weightplus = let a= ψref.a
+#         (r,z) ->8*ζ(r,z)^(4)*Σ(r,z)/((Δ(r,z))^2)
+#     end
+#     weightminus = let a= ψref.a
+#         (r,z) ->8*ζ(conj(r),z)^(4)*Σ(conj(r),z)/((Δ(conj(r),z))^2)
+#     end
+
+#      ## Define the useful contours
+#      r₊ = ψref.R.r₊ ; r₋ = ψref.R.r₋ ; s = ψref.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
+
+#      point1 = r₊ + Δr - Δr*im
+#      point2 = r₊ - Δr - Δr*im
+ 
+#      radial1 = SemiInfiniteLine(point1 , point1 + Δr*im , false)
+#      angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+#      C1 = radial1 ⊗ angular
+ 
+#      radial2 = LineSegment(point1,point2,true)
+#      C2 = radial2 ⊗ angular
+ 
+#      radial3 = SemiInfiniteLine(point2 , point2 + Δr*im , true)
+#      C3 = radial3 ⊗ angular
+ 
+#      TheContour = C1⊕C2⊕C3
+
+#     Oplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Opluscoefficients.csv"
+#     Ominusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Ominuscoefficients.csv"
+#     Oplus = OperatorShift(Oplusfile)
+#     Ominus = OperatorShift(Ominusfile)
+
+#     OplusHermiticity1 = OperatorSandwich(ψ,Oplus,weightplus,ψtest).Op
+#     OplusHermiticity2 = OperatorSandwich(ψtest,Oplus,weightplus,ψ).Op
+#     OminusHermiticity1 = OperatorSandwich(ψm,Ominus,weightminus,ψtestm).Op
+#     OminusHermiticity2= OperatorSandwich(ψtestm,Ominus,weightminus,ψm).Op
+
+#     @show OplusHermiticity1(3+im,0.5)
+#     @show OplusHermiticity2(3+im,0.5) 
+#     @show OminusHermiticity1(3+im,0.5)
+#     @show OminusHermiticity2(3+im,0.5)
+
+#     @show 𝒪plusHermiticity1= Integrate(OplusHermiticity1, TheContour)[1]
+#     @show 𝒪plusHermiticity2= Integrate(OplusHermiticity2, TheContour)[1]
+#     @show 𝒪minusHermiticity1= Integrate(OplusHermiticity1, TheContour)[1]
+#     @show 𝒪minusHermiticity2= Integrate(OplusHermiticity2, TheContour)[1]
+
+# end
+
+# @testset "TeukolskyOperator" begin
+    
+    # ψ = qnmfunctionnew(-2,2,2,0,0.1)
+    # ψ0 = qnmfunctionnew(-2,2,2,0,0.)
+
+    # ψm = qnmfunctionnew(-2,2,2,0,0.1,modesign="minus")
+    # ψ0m = qnmfunctionnew(-2,2,2,0,0.,modesign="minus")
+
+    # ω2=ψ.ω-ψ0.ω
+
+    # ψtest = qnmfunctionnew(2,5,3,0,0.)
+    # ψtest.ω=ψ0.ω
+    # ψtest.a=ψ0.a
+    # ψtest.m=ψ0.m
+    # ψtest.s=ψ0.s
+
+    # # Compile ψ
+    # ψ(1,.5)
+    # println("Past ψ compile")
+
+    # Σ = let a= ψ.a
+    #     (r,z) -> Complex(r)^2+a^2*z^2
+    # end
+    # Δ = let a= ψ.a
+    #     (r,z) -> Complex(r)^2+a^2-2*r
+    # end
+    # ζ = let a= ψ.a
+    #     (r,z) -> r-im*a*z
+    # end
+
+    # weightplus = let a= ψ.a
+    #     (r,z) ->8*ζ(r,z)^(4)*Σ(r,z)/((Δ(r,z))^2)
+    # end
+
+    # weightminus = let a= ψ.a
+    #     (r,z) ->8*ζ(conj(r),z)^(4)*Σ(conj(r),z)/((Δ(conj(r),z))^2)
+    # end
+
+
+    # Σ0 = let a= ψ0.a
+    #     (r,z) -> Complex(r)^2+a^2*z^2
+    # end
+    # Δ0 = let a= ψ0.a
+    #     (r,z) -> Complex(r)^2+a^2-2*r
+    # end
+    # ζ0 = let a= ψ0.a
+    #     (r,z) -> r-im*a*z
+    # end
+    # weight0plus = let a= ψ0.a
+    #     (r,z) ->8*ζ0(r,z)^(4)*Σ0(r,z)/((Δ0(r,z))^2)
+    # end
+    # weight0minus = let a= ψ0.a
+    #     (r,z) ->8*ζ0(conj(r),z)^(4)*Σ0(conj(r),z)/((Δ0(conj(r),z))^2)
+    # end
+    # println("Past weight")
+
+    # ## Define the useful contours
+    # r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
+
+    # point1 = r₊ + Δr - Δr*im
+    # point2 = r₊ - Δr - Δr*im
+
+    # radial1 = SemiInfiniteLine(point1 , point1 + Δr*im , false)
+    # angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+    # C1 = radial1 ⊗ angular
+
+    # radial2 = LineSegment(point1,point2,true)
+    # C2 = radial2 ⊗ angular
+
+    # radial3 = SemiInfiniteLine(point2 , point2 + Δr*im , true)
+    # C3 = radial3 ⊗ angular
+
+    # TheContour = C1⊕C2⊕C3
+
+    # r₊0 = ψ0.R.r₊ ; r₋0 = ψ0.R.r₋ ; s0 = ψ0.s ; Δr0 = 0.1*(r₊0-r₋0); ϵ = eps(0.1);
+
+    # point10 = r₊0 + Δr0 - Δr0*im
+    # point20 = r₊0 - Δr0 - Δr0*im
+
+    # radial10 = SemiInfiniteLine(point10 , point10 + Δr0*im , false)
+    # angular0 = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+    # C10 = radial10 ⊗ angular0
+
+    # radial20 = LineSegment(point10,point20,true)
+    # C20 = radial20 ⊗ angular0
+
+    # radial30 = SemiInfiniteLine(point20 , point20 + Δr0*im , true)
+    # C30 = radial30 ⊗ angular0
+
+    # TheContour0 = C10⊕C20⊕C30
+
+    # println("Done Contours")
+
+    # KerrOplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/KerrOpluscoefficients.csv"
+    # Oplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Opluscoefficients.csv"
+    # dwOplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/dwOpluscoefficients.csv"
+    # KerrOminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/KerrOminuscoefficients.csv"
+    # Ominusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Ominuscoefficients.csv"
+    # dwOminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/dwOminuscoefficients.csv"
+
+    # KerrOplus = OperatorShift(KerrOplusfile)
+    # KerrOminus = OperatorShift(KerrOminusfile)
+    # Oplus = OperatorShift(Oplusfile)
+    # ∂ωOplus = OperatorShift(dwOplusfile)
+    # Ominus = OperatorShift(Ominusfile)
+    # ∂ωOminus = OperatorShift(dwOminusfile)
+
+    # println("Made operator shifts")
+
+    # KerrOplusKerr = OperatorSandwich(ψ,KerrOplus,weightplus,ψ).Op
+    # KerrOminusKerr = OperatorSandwich(ψm,KerrOminus,weightminus,ψm).Op
+    # # HermiticityTest1 = OperatorSandwich(ψ0,Oplus,weight0,ψtest).Op
+    # # HermiticityTest2 = OperatorSandwich(ψtest,Oplus,weight0,ψ0).Op
+
+    # println("Made the first set of operators")
+    
+    # OplusKerr = OperatorSandwich(ψ0,Oplus,weight0plus,ψ).Op
+    # OplusSchw = OperatorSandwich(ψ0,Oplus,weight0plus,ψ0).Op
+    # ∂ωOplusSchw = OperatorSandwich(ψ0,∂ωOplus,weight0plus,ψ0).Op
+    # OminusKerr = OperatorSandwich(ψ0m,Ominus,weight0minus,ψm).Op
+    # OminusSchw = OperatorSandwich(ψ0m,Ominus,weight0minus,ψ0m).Op
+    # ∂ωOminusSchw = OperatorSandwich(ψ0m,∂ωOminus,weight0minus,ψ0m).Op
+
+    # println("Made Operators")
+
+    # # @show HermiticityTest1(3,0.5)
+    # # @show HermiticityTest2(3,0.5)
+
+    # @show KerrOplusKerr(3+im,0.5)
+    # @show KerrOminusKerr(3+im,0.5)
+
+    # @show OplusKerr(3+im,0.5)
+    # @show OplusSchw(3+im,0.5)
+    # @show ∂ωOplusSchw(3+im,0.5)
+
+    # @show OminusKerr(3+im,0.5)
+    # @show OminusSchw(3+im,0.5)
+    # @show ∂ωOminusSchw(3+im,0.5)
+
+    # println("Complied Operators")
+
+    # # HermiticityTestResult1 = Integrate(HermiticityTest1,TheContour0)[1]
+    # # @show HermiticityTestResult1
+    # # HermiticityTestResult2 = Integrate(HermiticityTest2,TheContour0)[1]
+    # # @show HermiticityTestResult2
+   
+    # ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour0)[1]
+    # 𝒪plusKerr= Integrate(OplusKerr, TheContour)[1]
+    # @show 𝒪plusKerr
+    # @show ∂ω𝒪plusSchw
+    # @show ω2*∂ω𝒪plusSchw
+
+    # ∂ω𝒪minusSchw= Integrate(∂ωOminusSchw, TheContour0)[1]
+    # 𝒪minusKerr= Integrate(OminusKerr, TheContour)[1]
+    # @show 𝒪minusKerr
+    # @show ∂ω𝒪minusSchw
+    # @show -conj(ω2)*∂ω𝒪minusSchw
     
 # end
 
