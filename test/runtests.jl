@@ -1,13 +1,18 @@
-push!(LOAD_PATH, "C:/Users/dwuuu/Documents/GitHub/ContourIntegrals.jl")
-push!(LOAD_PATH, "C:/Users/dwuuu/Documents/GitHub/SchwarzschildQNMs")
-push!(LOAD_PATH, "C:/Users/dwuuu/Documents/GitHub/KerrQuasinormalModes.jl")
+# push!(LOAD_PATH, "C:/Users/dwuuu/Documents/GitHub/ContourIntegrals.jl")
+# push!(LOAD_PATH, "C:/Users/dwuuu/Documents/GitHub/SchwarzschildQNMs")
+# push!(LOAD_PATH, "C:/Users/dwuuu/Documents/GitHub/KerrQuasinormalModes.jl")
 
 using ContourIntegrals
 using KerrQNMShifts
 using KerrQuasinormalModes
 using Test
+using Zygote
 
 println("Done usings")
+
+function finitedifference(ψ,r,θ,dr;isconjugate=false)
+    return (ψ(r+dr,θ,isconjugate=isconjugate)-ψ(r,θ,isconjugate=isconjugate))/dr
+end
 
 function compute_derivative_matrix(ψ, r, θ)
     # Initialize a 5x5 matrix to hold the derivatives
@@ -91,6 +96,17 @@ println("Done deriv funcs")
     Iplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Ipluscoefficients.csv"
     Iminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Iminuscoefficients.csv"
 
+    TruncIplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/TruncatedIpluscoefficients.csv"
+    TruncIplus = OperatorShift(TruncIplusfile)
+    TruncIplusSchw = OperatorSandwich(ψ,TruncIplus,weightplus,ψm).Op
+    @show TruncIplusSchw(3,0.4,pertparam=.1,isconjugate=true)
+
+    FormIplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/FormIpluscoefficients.csv"
+    FormIplus = OperatorShift(FormIplusfile)
+    FormIplusSchw = OperatorSandwich(ψ,FormIplus,weightplus,ψm).Op
+    @show FormIplusSchw(3,0.4,pertparam=.1,isconjugate=true)
+
+
     ∂ωOplus = OperatorShift(dwOplusfile)
     ∂ωOminus = OperatorShift(dwOminusfile)
     Hplus = OperatorShift(Hplusfile)
@@ -104,26 +120,26 @@ println("Done deriv funcs")
     ∂ωOminusSchw = OperatorSandwich(ψm,∂ωOminus,weightminus,ψm).Op
     HplusSchw = OperatorSandwich(ψ,Hplus,weightplus,ψ).Op
     HminusSchw = OperatorSandwich(ψm,Hminus,weightminus,ψm).Op
-    IminusSchw = OperatorSandwich(ψm,Iminus,weightminus,ψ).Op
     IplusSchw = OperatorSandwich(ψ,Iplus,weightplus,ψm).Op
+    IminusSchw = OperatorSandwich(ψm,Iminus,weightminus,ψ).Op
 
     println("Made Operators")
 
-    @show ∂ωOplusSchw(3+im,0.5)
-    @show ∂ωOminusSchw(3+im,0.5)
-    @show HplusSchw(3+im,0.5)
-    @show HminusSchw(3+im,0.5)
-    @show IminusSchw(3+im,0.5)
-    @show IplusSchw(3+im,0.5)
+    @show ∂ωOplusSchw(3+im,0.5,pertparam=.1)
+    @show ∂ωOminusSchw(3+im,0.5,pertparam=.1)
+    @show HplusSchw(3+im,0.5,pertparam=.1)
+    @show HminusSchw(3+im,0.5,pertparam=.1)
+    @show IplusSchw(3+im,0.5,pertparam=.1)
+    @show IminusSchw(3+im,0.5,pertparam=.1)
 
     println("Complied Operators")
 
-    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour)[1]
-    ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContour)[1])
-    ℋplusSchw= Integrate(HplusSchw, TheContour)[1]
-    ℋminusSchw= conj(Integrate(HminusSchw, TheContour)[1])
-    ℐplusSchw= Integrate(IplusSchw, TheContour, isconjugate = true)[1]
-    ℐminusSchw= conj(Integrate(IminusSchw, TheContour, isconjugate = true)[1])
+    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour,pertparam=.1)[1]
+    ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContour,pertparam=.1)[1])
+    ℋplusSchw= Integrate(HplusSchw, TheContour,pertparam=.1)[1]
+    ℋminusSchw= conj(Integrate(HminusSchw, TheContour,pertparam=.1)[1])
+    ℐplusSchw= Integrate(IplusSchw, TheContour, isconjugate = true,pertparam=.1)[1]
+    ℐminusSchw= conj(Integrate(IminusSchw, TheContour, isconjugate = true,pertparam=.1)[1])
 
     @show ∂ω𝒪plusSchw
     @show ∂ω𝒪minusSchw
