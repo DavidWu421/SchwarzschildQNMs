@@ -44,8 +44,10 @@ println("Done deriv funcs")
 # @testset "KerrAsPertub" begin
     
     ψ = qnmfunctionnew(-2,2,2,0,0.)
+    ψconj = qnmfunctionnew(-2,2,2,0,0.,is_conjugate=true)
 
     ψm = qnmfunctionnew(-2,2,2,0,0.,modesign="minus")
+    ψmconj = qnmfunctionnew(-2,2,2,0,0.,modesign="minus",is_conjugate=true)
 
     # Compile ψ
     ψ(1,.5)
@@ -99,12 +101,12 @@ println("Done deriv funcs")
     TruncIplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/TruncatedIpluscoefficients.csv"
     TruncIplus = OperatorShift(TruncIplusfile)
     TruncIplusSchw = OperatorSandwich(ψ,TruncIplus,weightplus,ψm).Op
-    @show TruncIplusSchw(3,0.4,pertparam=.1,isconjugate=true)
+    @show TruncIplusSchw(3,0.4,pertparam=.1)
 
     FormIplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/FormIpluscoefficients.csv"
     FormIplus = OperatorShift(FormIplusfile)
     FormIplusSchw = OperatorSandwich(ψ,FormIplus,weightplus,ψm).Op
-    @show FormIplusSchw(3,0.4,pertparam=.1,isconjugate=true)
+    @show FormIplusSchw(3,0.4,pertparam=.1)
 
 
     ∂ωOplus = OperatorShift(dwOplusfile)
