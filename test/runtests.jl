@@ -10,15 +10,79 @@ using Zygote
 
 println("Done usings")
 
+using Plots
+
+
+function make_plots(func, zbound,zstep; filename="savedfile",pertparam=.1)
+    # Define the complex plane grid
+    xmin, xmax = 2.15, 2.25
+    ymin, ymax = -.3, .3
+    n_points = 100
+    x = range(xmin, xmax, length=n_points)
+    y = range(ymin, ymax, length=n_points)
+    grid = [x[i] + im * y[j] for i in 1:n_points, j in 1:n_points]
+    # Get the global color limits for consistent scaling
+    clim = (-3, 3)
+    zstepper=-zbound
+    while zstepper < zbound
+        # Compute function values
+        values = [func(r,zstepper,pertparam=pertparam) for r in grid]
+        # Exclude the region 1.99 < x < 2.01 and -0.01 < y < 0.01
+        for i in 1:n_points, j in 1:n_points
+            if 1.9 < real(grid[i, j]) < 2.1 && -0.1 < imag(grid[i, j]) < 0.1
+                values[i, j] = NaN
+            end
+        end
+
+        # Extract real and imaginary parts
+        real_part = real.(values)
+        imag_part = imag.(values)
+
+        # Plot the real part
+        plot_real = heatmap(x, y, real_part',
+            title = "Real Part of operator(r)",
+            xlabel = "Re(r)",
+            ylabel = "Im(r)",
+            clim=clim,
+            colorbar_title = "Re(operator)")
+
+        # Plot the imaginary part
+        plot_imag = heatmap(x, y, imag_part',
+            title = "Imaginary Part of operator(r)",
+            xlabel = "Re(r)",
+            ylabel = "Im(r)",
+            clim=clim,
+            colorbar_title = "Im(operator)")
+
+        # Display the plots
+        plot(plot_real, plot_imag, layout = (1, 2), size = (800, 400))
+        if zstepper < 0
+            savefig(filename*"m"*string(abs(round(zstepper,digits=1)))*".png")
+        elseif zstepper >=0
+            savefig(filename*string(abs(round(zstepper,digits=1)))*".png")
+        end
+
+        zstepper+=zstep
+    end
+end
+
+function evaltime(ψ,start_r, num_steps,step_size)
+    value=ψ(start_r,.5, pertparam=.1)
+    for i in 0:num_steps
+        value+=ψ(start_r+i*step_size,.5,pertparam=.1)
+    end
+    return value
+end
+
 function finitedifference(ψ,r,θ,dr;isconjugate=false)
     return (ψ(r+dr,θ,isconjugate=isconjugate)-ψ(r,θ,isconjugate=isconjugate))/dr
 end
 
 function compute_derivative_matrix(ψ, r, θ)
     # Initialize a 5x5 matrix to hold the derivatives
-    derivatives = Matrix{ComplexF64}(undef, 5, 5)
-    for i in 0:4
-        for j in 0:4
+    derivatives = Matrix{ComplexF64}(undef, 7, 7)
+    for i in 0:6
+        for j in 0:6
             temp_ψ = ψ
             for _ in 1:i
                 temp_ψ = ∂r(temp_ψ)
@@ -91,23 +155,18 @@ println("Done deriv funcs")
     TheContour = C1⊕C2⊕C3
     println("Done Contours")
 
+    # testradial = LineSegment(r₊ + Δr+1im,r₊ + Δr+.5im,true)
+    # TestC = testradial ⊗ angular
+    
+    # @time Integrate(HplusSchw, TestC,pertparam=.1)[1]
+    # @time Integrate(HminusSchw, TestC,pertparam=.1)[1]
+
     dwOplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/dwOpluscoefficients.csv"
     dwOminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/dwOminuscoefficients.csv"
     Hplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Hpluscoefficients.csv"
     Hminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Hminuscoefficients.csv"
     Iplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Ipluscoefficients.csv"
     Iminusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/Iminuscoefficients.csv"
-
-    TruncIplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/TruncatedIpluscoefficients.csv"
-    TruncIplus = OperatorShift(TruncIplusfile)
-    TruncIplusSchw = OperatorSandwich(ψ,TruncIplus,weightplus,ψm).Op
-    @show TruncIplusSchw(3,0.4,pertparam=.1)
-
-    FormIplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/FormIpluscoefficients.csv"
-    FormIplus = OperatorShift(FormIplusfile)
-    FormIplusSchw = OperatorSandwich(ψ,FormIplus,weightplus,ψm).Op
-    @show FormIplusSchw(3,0.4,pertparam=.1)
-
 
     ∂ωOplus = OperatorShift(dwOplusfile)
     ∂ωOminus = OperatorShift(dwOminusfile)
@@ -122,26 +181,33 @@ println("Done deriv funcs")
     ∂ωOminusSchw = OperatorSandwich(ψm,∂ωOminus,weightminus,ψm).Op
     HplusSchw = OperatorSandwich(ψ,Hplus,weightplus,ψ).Op
     HminusSchw = OperatorSandwich(ψm,Hminus,weightminus,ψm).Op
-    IplusSchw = OperatorSandwich(ψ,Iplus,weightplus,ψm).Op
-    IminusSchw = OperatorSandwich(ψm,Iminus,weightminus,ψ).Op
+    IplusSchw = OperatorSandwich(ψ,Iplus,weightplus,ψmconj).Op
+    IminusSchw = OperatorSandwich(ψm,Iminus,weightminus,ψconj).Op
 
     println("Made Operators")
 
-    @show ∂ωOplusSchw(3+im,0.5,pertparam=.1)
-    @show ∂ωOminusSchw(3+im,0.5,pertparam=.1)
-    @show HplusSchw(3+im,0.5,pertparam=.1)
-    @show HminusSchw(3+im,0.5,pertparam=.1)
-    @show IplusSchw(3+im,0.5,pertparam=.1)
-    @show IminusSchw(3+im,0.5,pertparam=.1)
+    @show ∂ωOplusSchw(3,0.4,pertparam=.1)
+    @show ∂ωOminusSchw(3,0.4,pertparam=.1)
+    @show HplusSchw(3,0.4,pertparam=.1)
+    @show HminusSchw(3,0.4,pertparam=.1)
+    @show IplusSchw(3,0.4,pertparam=.1)
+    @show IminusSchw(3,0.4,pertparam=.1)
+
+    @show ∂ωOplusSchw(8+im,0.6,pertparam=.1)
+    @show ∂ωOminusSchw(8+im,0.6,pertparam=.1)
+    @show HplusSchw(8+im,0.6,pertparam=.1)
+    @show HminusSchw(8+im,0.6,pertparam=.1)
+    @show IplusSchw(8+im,0.6,pertparam=.1)
+    @show IminusSchw(8+im,0.6,pertparam=.1)
 
     println("Complied Operators")
 
-    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour,pertparam=.1)[1]
-    ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContour,pertparam=.1)[1])
-    ℋplusSchw= Integrate(HplusSchw, TheContour,pertparam=.1)[1]
-    ℋminusSchw= conj(Integrate(HminusSchw, TheContour,pertparam=.1)[1])
-    ℐplusSchw= Integrate(IplusSchw, TheContour, isconjugate = true,pertparam=.1)[1]
-    ℐminusSchw= conj(Integrate(IminusSchw, TheContour, isconjugate = true,pertparam=.1)[1])
+    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContour,pertparam=.1,abstol=1e-6)[1]
+    ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContour,pertparam=.1,abstol=1e-6)[1])
+    ℋplusSchw= Integrate(HplusSchw, TheContour,pertparam=.1,abstol=1e-6)[1]
+    ℋminusSchw= conj(Integrate(HminusSchw, TheContour,pertparam=.1,abstol=1e-6)[1])
+    ℐplusSchw= Integrate(IplusSchw, TheContour,pertparam=.1,abstol=1e-6)[1]
+    ℐminusSchw= conj(Integrate(IminusSchw, TheContour,pertparam=.1,abstol=1e-6)[1])
 
     @show ∂ω𝒪plusSchw
     @show ∂ω𝒪minusSchw
