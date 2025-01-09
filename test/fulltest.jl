@@ -12,16 +12,14 @@ println("Done usings")
     
     ψ = qnmfunctionnew(-2,2,2,0,0.)
 
-    ψm = qnmfunctionnew(-2,2,2,0,0.,modesign="minus")
+    ψm = qnmfunctionnew(-2,2,2,0,0.,is_minus=true)
 
     ψ1 = qnmfunctionnew(-2,4,2,0,0.1)
-    ψm1 = qnmfunctionnew(-2,4,2,0,0.1,modesign="minus")
+    ψm1 = qnmfunctionnew(-2,4,2,0,0.1,is_minus=true)
     ψ2 = qnmfunctionnew(-2,4,2,0,0.)
-    ψm2 = qnmfunctionnew(-2,4,2,0,0.,modesign="minus")
+    ψm2 = qnmfunctionnew(-2,4,2,0,0.,is_minus=true)
     ψ3 = qnmfunctionnew(-2,5,2,0,0.)
-    ψm3 = qnmfunctionnew(-2,5,2,0,0.,modesign="minus")
-    ψ4 = qnmfunctionnew(-2,5,3,0,0.)
-    ψm4 = qnmfunctionnew(-2,5,3,0,0.,modesign="minus")
+    ψm3 = qnmfunctionnew(-2,5,2,0,0.,is_minus=true)
 
     # Compile ψ
     ψ(1,.5)
@@ -74,21 +72,22 @@ println("Done usings")
 
     println("Made operator shifts")
     
+    OplusSchw0check = OperatorSandwich(ψm,Oplus,weightplus,ψ).Op
+    OminusSchw0check = OperatorSandwich(ψ,Ominus,weightminus,ψm).Op
+
     
     OplusSchw1 = OperatorSandwich(ψ,Oplus,weightplus,ψ1).Op
-    OminusSchw1 = OperatorSandwich(ψm,Ominus,weightminus,ψ1).Op
+    OminusSchw1 = OperatorSandwich(ψm,Ominus,weightminus,ψm1).Op
     OplusSchw2 = OperatorSandwich(ψ,Oplus,weightplus,ψ2).Op
-    OminusSchw2 = OperatorSandwich(ψm,Ominus,weightminus,ψ2).Op
+    OminusSchw2 = OperatorSandwich(ψm,Ominus,weightminus,ψm2).Op
     OplusSchw3 = OperatorSandwich(ψ,Oplus,weightplus,ψ3).Op
-    OminusSchw3 = OperatorSandwich(ψm,Ominus,weightminus,ψ3).Op
-    OplusSchw4 = OperatorSandwich(ψ,Oplus,weightplus,ψ4).Op
-    OminusSchw4 = OperatorSandwich(ψm,Ominus,weightminus,ψ4).Op
+    OminusSchw3 = OperatorSandwich(ψm,Ominus,weightminus,ψm3).Op
 
-    # OminusSchw0check = OperatorSandwich(ψmweird,Ominus,weightminus,ψm).Op
-
+    
     println("Made Operators")
 
-    # @show OminusSchw0check(8+im,.6,pertparam=pert_a)
+    @show OplusSchw0check(8+im,.6,pertparam=pert_a)
+    @show OminusSchw0check(8+im,.6,pertparam=pert_a)
 
     @show OplusSchw1(8+im,0.6,pertparam=pert_a)
     @show OminusSchw1(8+im,0.6,pertparam=pert_a)
@@ -96,8 +95,6 @@ println("Done usings")
     @show OminusSchw2(8+im,0.6,pertparam=pert_a)
     @show OplusSchw3(8+im,0.6,pertparam=pert_a)
     @show OminusSchw3(8+im,0.6,pertparam=pert_a)
-    @show OplusSchw4(8+im,0.6,pertparam=pert_a)
-    @show OminusSchw4(8+im,0.6,pertparam=pert_a)
 
     println("Complied Operators")
 
@@ -107,8 +104,6 @@ println("Done usings")
     𝒪minusSchw2= Integrate(OminusSchw2, TheContour,pertparam=pert_a,abstol=1e-6)[1]
     𝒪plusSchw3= Integrate(OplusSchw3, TheContour,pertparam=pert_a,abstol=1e-6)[1]
     𝒪minusSchw3= Integrate(OminusSchw3, TheContour,pertparam=pert_a,abstol=1e-6)[1]
-    𝒪plusSchw4= Integrate(OplusSchw4, TheContour,pertparam=pert_a,abstol=1e-6)[1]
-    𝒪minusSchw4= Integrate(OminusSchw4, TheContour,pertparam=pert_a,abstol=1e-6)[1]
 
     @show 𝒪plusSchw1
     @show 𝒪minusSchw1
@@ -116,20 +111,18 @@ println("Done usings")
     @show 𝒪minusSchw2
     @show 𝒪plusSchw3
     @show 𝒪minusSchw3
-    @show 𝒪plusSchw4
-    @show 𝒪minusSchw4
 end
 
 @testset "KerrAsPerturb" begin
 
     println("Started KerrAsPertub Test: ")
-    pert_a=.01
+    pert_a=.1
     
     ψ = qnmfunctionnew(-2,2,2,0,0.)
     ψconj = qnmfunctionnew(-2,2,2,0,0.,is_conjugate=true)
 
-    ψm = qnmfunctionnew(-2,2,2,0,0.,modesign="minus")
-    ψmconj = qnmfunctionnew(-2,2,2,0,0.,modesign="minus",is_conjugate=true)
+    ψm = qnmfunctionnew(-2,2,2,0,0.,is_minus=true)
+    ψmconj = qnmfunctionnew(-2,2,2,0,0.,is_minus=true,is_conjugate=true)
 
     # Compile ψ
     ψ(1,.5)
