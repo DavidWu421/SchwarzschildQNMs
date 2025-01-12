@@ -6,6 +6,105 @@ using Zygote
 
 println("Done usings")
 
+@testtset "DirectionFlip" begin
+    pert_a=.1
+    
+    ψ = qnmfunctionnew(-2,2,2,0,0.)
+
+    ψm = qnmfunctionnew(-2,2,2,0,0.,is_minus=true)
+
+    ψ1 = qnmfunctionnew(-2,4,2,0,0.1)
+    ψm1 = qnmfunctionnew(-2,4,2,0,0.1,is_minus=true)
+
+    # Compile ψ
+    ψ(1,.5)
+    println("Past ψ compile")
+
+    Σ = let a= ψ.a
+        (r,z) -> Complex(r)^2+a^2*z^2
+    end
+    Δ = let a= ψ.a
+        (r,z) -> Complex(r)^2+a^2-2*r
+    end
+    ζ = let a= ψ.a
+        (r,z) -> r-im*a*z
+    end
+
+    weight = let a= ψ.a
+        (r,z) ->8*ζ(r,z)^(4)*Σ(r,z)/((Δ(r,z))^2)
+    end
+
+    println("Past weight")
+
+    ## Define the useful contours
+    r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
+
+    #The upwards pointing contour
+    point1up = r₊ + Δr - Δr*im
+    point2up = r₊ - Δr - Δr*im
+
+    radial1up = SemiInfiniteLine(point1up , point1up + Δr*im , false)
+    angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+    C1up = radial1up ⊗ angular
+
+    radial2up = LineSegment(point1up,point2up,true)
+    C2up = radial2up ⊗ angular
+
+    radial3up = SemiInfiniteLine(point2up , point2up + Δr*im , true)
+    C3up = radial3up ⊗ angular
+
+    TheContourup = C1up⊕C2up⊕C3up
+
+    #The downwards pointing contour
+    point1down = r₊ + Δr + Δr*im
+    point2down = r₊ - Δr + Δr*im
+
+    radial1down = SemiInfiniteLine(point1down , point1down - Δr*im , false)
+    angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+    C1down = radial1down ⊗ angular
+
+    radial2down = LineSegment(point1down,point2down,true)
+    C2down = radial2down ⊗ angular
+
+    radial3down = SemiInfiniteLine(point2down , point2down - Δr*im , true)
+    C3down = radial3down ⊗ angular
+
+    TheContourdown = C1down⊕C2down⊕C3down
+    println("Done Contours")
+
+    Oplusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/HermTestOpluscoefficients.csv"
+    Ominusfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/SavedFiles/HermTestOminuscoefficients2.csv"
+
+    Oplus=OperatorShift(Oplusfile)
+    Ominus=OperatorShift(Ominusfile)
+
+    println("Made operator shifts")
+    
+    OplusSchw0check = OperatorSandwich(ψ1,Oplus,weight,ψ).Op
+    OminusSchw0check = OperatorSandwich(ψm1,Ominus,weight,ψm).Op
+
+    
+    OplusSchw1 = OperatorSandwich(ψ,Oplus,weight,ψ1).Op
+    OminusSchw1 = OperatorSandwich(ψm,Ominus,weight,ψm1).Op
+
+    
+    println("Made Operators")
+
+    @show OplusSchw0check(8+im,.6,pertparam=pert_a)
+    @show OminusSchw0check(8+im,.6,pertparam=pert_a)
+
+    @show OplusSchw1(8+im,0.6,pertparam=pert_a)
+    @show OminusSchw1(8+im,0.6,pertparam=pert_a)
+
+    println("Complied Operators")
+
+    𝒪plusSchw1= Integrate(OplusSchw1, TheContourup,pertparam=pert_a,abstol=1e-6)[1]
+    𝒪minusSchw1= Integrate(OminusSchw1, TheContourdown,pertparam=pert_a,abstol=1e-6)[1]
+
+    @show 𝒪plusSchw1
+    @show 𝒪minusSchw1
+end
+
 @testset "HermiticityTest" begin
     println("Started HermiticityTest: ")
     pert_a=.1
