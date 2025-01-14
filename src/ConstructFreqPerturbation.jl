@@ -15,7 +15,7 @@ end
 function Compute𝒞plus(ψ::QuasinormalModeFunction,Dplus)
     ω=ψ.ω;
     𝒞plus=Dplus^2+144*ω^2
-    println("𝒞plus: ", 𝒞plus)
+    # println("𝒞plus: ", 𝒞plus)
     𝒞plus
 end
 
@@ -26,7 +26,7 @@ function Computeγs(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     γ1=(-b+sqrt(b^2-4*a*c))/(2*a)
     γ2=(-b-sqrt(b^2-4*a*c))/(2*a)
     γs=(γ1,γ2)
-    println("γs: ", γs)
+    # println("γs: ", γs)
     γs
 end
 
@@ -54,13 +54,14 @@ function Computeω2(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     As=ComputeAs(𝒞plus,Dplus,ψ,γs)
     Bs= ComputeBs(𝒞plus,Dplus,ψ,γs)
 
-    println("As: ",As)
-    println("Bs: ",Bs)
-    println("numerator: ",(As[1]*HplusInt+conj(Bs[1])IplusInt))
-    println("∂ωOplusInt: ",∂ωOplusInt)
+    # println("As: ",As)
+    # println("Bs: ",Bs)
+    # println("numerator: ",(As[1]*HplusInt+conj(Bs[1])IplusInt))
 
     ω2up=-((As[1]*HplusInt+conj(Bs[1])IplusInt)/∂ωOplusInt)
     ω2down=-((As[2]*HplusInt+conj(Bs[2])IplusInt)/∂ωOplusInt)
+    # println((conj(Bs[1])*HminusInt+As[1]*IminusInt)/(γs[1]*∂ωOminusInt))
+    # println((conj(Bs[2])*HminusInt+As[2]*IminusInt)/(γs[2]*∂ωOminusInt))
 
     ωs=(ω2up,ω2down)
     ωs

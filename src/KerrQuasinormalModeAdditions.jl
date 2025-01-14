@@ -19,5 +19,8 @@ function qnmfunctionnew(s,l,m,n,a; qnm=qnm,is_conjugate=false,is_minus=false)
         Cllʼ=[i % 2 == 0 ? -x : x for (i, x) in enumerate(Cllʼ)]
         Cllʼ=(-1)^l*conj.(Cllʼ)
     end
+    if is_conjugate==true
+        Alm=conj(Alm)
+    end
     qnmfunction(Custom; s=s,l=l,m=m,n=n,a=a,ω=ω,Alm=Alm,Cllʼ=Cllʼ,is_conjugate=is_conjugate,is_minus=is_minus)
 end
