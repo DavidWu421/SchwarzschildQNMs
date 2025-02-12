@@ -4,8 +4,19 @@ struct FreqPertub
 end
 
 function ComputeDplus(ψ::QuasinormalModeFunction)
+    @assert ψ.s==-2 "ComputeDplus should only be used when s=-2. If s=+2, use ComputeDplusm instead"
     Alm=ψ.Alm; a=ψ.a; m=ψ.m; ω=ψ.ω;
     λlm=Alm+a^2*ω^2-2*a*m*ω
+    D²=λlm^2*(λlm+2)^2-8*λlm*(5*λlm+6)*(a^2*ω^2-a*m*ω)+96*λlm*a^2*ω^2+
+        144*(a^2*ω^2-a*m*ω)^2
+    Dplus=sqrt(D²)
+    Dplus
+end
+
+function ComputeDplusm(ψ::QuasinormalModeFunction)
+    @assert ψ.s==2 "ComputeDplusm should only be used when s=+2. If s=2, use ComputeDplus instead"
+    Alm=ψ.Alm; a=ψ.a; m=ψ.m; ω=ψ.ω;
+    λlm=Alm+a^2*ω^2-2*a*m*ω+4
     D²=λlm^2*(λlm+2)^2-8*λlm*(5*λlm+6)*(a^2*ω^2-a*m*ω)+96*λlm*a^2*ω^2+
         144*(a^2*ω^2-a*m*ω)^2
     Dplus=sqrt(D²)
@@ -23,6 +34,9 @@ function Computeγs(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     a=Dplus*HplusInt*∂ωOminusInt-12*im*ω*IplusInt*∂ωOminusInt
     b=Dplus*(IplusInt*∂ωOminusInt+IminusInt*∂ωOplusInt)-12*im*ω*(HplusInt*∂ωOminusInt+HminusInt*∂ωOplusInt)
     c=Dplus*HminusInt*∂ωOplusInt-12*im*ω*IminusInt*∂ωOplusInt
+    # println("a: ",a)
+    # println("b: ",b)
+    # println("c: ",c)
     γ1=(-b+sqrt(b^2-4*a*c))/(2*a)
     γ2=(-b-sqrt(b^2-4*a*c))/(2*a)
     γs=(γ1,γ2)
@@ -51,6 +65,10 @@ function Computeω2(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     Dplus=ComputeDplus(ψ)
     𝒞plus= Compute𝒞plus(ψ,Dplus)
     γs=Computeγs(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,IminusInt,Dplus,ψ.m,ψ.ω)
+    if all(z -> isnan(real(z)) && isnan(imag(z)), γs)
+        γs=(2,1)
+    end
+    println("γs: ", γs)
     As=ComputeAs(𝒞plus,Dplus,ψ,γs)
     Bs= ComputeBs(𝒞plus,Dplus,ψ,γs)
 

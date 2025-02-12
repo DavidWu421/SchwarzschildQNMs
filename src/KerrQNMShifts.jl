@@ -18,6 +18,6 @@ include("ConstructFreqPerturbation.jl")
 
 
 export qnm, qnmfunctionnew, importqnm
-export OperatorShift, OperatorSandwich, Computeω2, ComputeDplus,Compute𝒞plus
+export OperatorShift, OperatorSandwich, Computeω2, ComputeDplus,Compute𝒞plus, ComputeDplusm
 
 end
