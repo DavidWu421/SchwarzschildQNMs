@@ -255,10 +255,10 @@ end
     # dwOfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/1_14_Old/dwOcoefficients.csv"
     # Hfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/1_14_Old/Hcoefficients.csv"
     # Ifile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/1_14_Old/Icoefficients.csv"
-    Ofile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/Ocoefficients.csv"
-    dwOfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/dwOcoefficients.csv"
-    Hfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/Hcoefficients.csv"
-    Ifile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/Icoefficients.csv"
+    Ofile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/G2Test/Ocoefficients.csv"
+    dwOfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/G2Test/dwOcoefficients.csv"
+    Hfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/G2Test/Hcoefficients.csv"
+    Ifile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/FullTest/G2Test/Icoefficients.csv"
 
     O = OperatorShift(Ofile)
     ∂ωO = OperatorShift(dwOfile)
