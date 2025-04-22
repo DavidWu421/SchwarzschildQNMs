@@ -8,7 +8,6 @@ function GetExprMetric(file)
         d = d == "-" ? "" : d
         d = replace(d,"th"=>"θ")
         f = replace(f,"omega"=>"ω")
-        f = replace(f,"spina"=>"pertparam")
         ps = "ψ"*d
         push!(exprs,"($f)*$(ps)(r,x)")
     end
