@@ -76,11 +76,15 @@ function Computeω2(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     # println("Bs: ",Bs)
     # println("numerator: ",(As[1]*HplusInt+conj(Bs[1])IplusInt))
 
-    ω2up=-((As[1]*HplusInt+conj(Bs[1])IplusInt)/∂ωOplusInt)
-    ω2down=-((As[2]*HplusInt+conj(Bs[2])IplusInt)/∂ωOplusInt)
+    ω1=-((As[1]*HplusInt+conj(Bs[1])IplusInt)/∂ωOplusInt)
+    ω2=-((As[2]*HplusInt+conj(Bs[2])IplusInt)/∂ωOplusInt)
     # println((conj(Bs[1])*HminusInt+As[1]*IminusInt)/(γs[1]*∂ωOminusInt))
     # println((conj(Bs[2])*HminusInt+As[2]*IminusInt)/(γs[2]*∂ωOminusInt))
 
-    ωs=(ω2up,ω2down)
+    if imag(ω1)>imag(ω2)
+        ωs=(ω1,ω2)
+    else
+        ωs=(ω2,ω1)
+    end
     ωs
 end

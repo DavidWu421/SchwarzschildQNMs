@@ -18,13 +18,13 @@ println("Done usings")
 
     println("Made operator shifts")
 
-    freqpertsmatrix =DataFrame(l = Int[], m = Int[], n = Int[], a = Float64[] ,ϵ = Float64[], value = ComplexF64[])
+    freqpertsmatrix =DataFrame(l = Int[], m = Int[], n = Int[], a = Float64[] , Reωup = ComplexF64[], Imωup = ComplexF64[], Reωdown = ComplexF64[], Imωdown = ComplexF64[])
     lmax=10
 
     for l in 2:lmax
         m=l
         n=0
-        for a in [0.0, 0.05]
+        for a in [0.0, 0.05,0.1]
             ψ = qnmfunctionnew(-2,l,m,n,a)
             ψconj = qnmfunctionnew(-2,l,m,n,a,is_conjugate=true)
             ψm = qnmfunctionnew(-2,l,m,n,a,is_minus=true)
@@ -90,15 +90,13 @@ println("Done usings")
             ℐlinplusSchw= Integrate(IlinplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-8)[1]
             ℐlinminusSchw= conj(Integrate(IlinminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-8)[1])
             ω2s=Computeω2(∂ω𝒪plusSchw,∂ω𝒪minusSchw,ℋlinplusSchw,ℋlinminusSchw,ℐlinplusSchw,ℐlinminusSchw,ψ)
-            @show ω2s[1],pert_ϵ
+            @show ω2s
 
-            for pert_ϵ_iter in [0.025, 0.05]
-                push!(freqpertsmatrix, (l, m, n, a, pert_ϵ_iter, ω2s[1]*pert_ϵ_iter))
-            end
+            push!(freqpertsmatrix, (l, m, n, a, real(ω2s[1]),imag(ω2s[1]),real(ω2s[2]),imag(ω2s[2])))
         end
     end
 
-    CSV.write("/home/dgw763/Documents/LinearizedSpin/Eikonal.csv", freqpertsmatrix)
+    CSV.write("/home/dgw763/Documents/LinearizedSpin/SpectralitySplit/Eikonal.csv", freqpertsmatrix)
 end
 
 @testset "LinearizedJP220" begin
@@ -298,7 +296,7 @@ end
 end
 
 @testset "LinearizedJPSingle" begin
-    pert_ϵ=.1
+    pert_ϵ=1
     
     ψ = qnmfunctionnew(-2,2,2,0,0.1)
     ψconj = qnmfunctionnew(-2,2,2,0,0.1,is_conjugate=true)
