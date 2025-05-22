@@ -82,9 +82,9 @@ function Computeω2(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     # println((conj(Bs[2])*HminusInt+As[2]*IminusInt)/(γs[2]*∂ωOminusInt))
 
     if imag(ω1)>imag(ω2)
-        ωs=(ω1,ω2)
+        ωs=(ω1,ω2,γ[1],γ[2])
     else
-        ωs=(ω2,ω1)
+        ωs=(ω2,ω1,γ[2],γ[1])
     end
     ωs
 end
