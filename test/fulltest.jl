@@ -18,13 +18,13 @@ println("Done usings")
 
     println("Made operator shifts")
 
-    freqpertsmatrix =DataFrame(l = Int[], m = Int[], n = Int[], a = Float64[] , Reωup = ComplexF64[], Imωup = ComplexF64[], Reωdown = ComplexF64[], Imωdown = ComplexF64[])
-    lmax=10
+    freqpertsmatrix =DataFrame(l = Int[], m = Int[], n = Int[], a = Float64[] , ωup = ComplexF64[], γup = ComplexF64[], ωdown = ComplexF64[], γdown = ComplexF64[])
+    lmax=8
 
     for l in 2:lmax
         m=l
-        n=0
-        for a in [0.0, 0.05,0.1]
+        n=2
+        for a in [0.]
             ψ = qnmfunctionnew(-2,l,m,n,a)
             ψconj = qnmfunctionnew(-2,l,m,n,a,is_conjugate=true)
             ψm = qnmfunctionnew(-2,l,m,n,a,is_minus=true)
@@ -83,23 +83,23 @@ println("Done usings")
             println("Made Operators")
 
             pert_ϵ=1
-            ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-8)[1]
-            ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-8)[1])
-            ℋlinplusSchw= Integrate(HlinplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-8)[1]
-            ℋlinminusSchw= conj(Integrate(HlinminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-8)[1])
-            ℐlinplusSchw= Integrate(IlinplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-8)[1]
-            ℐlinminusSchw= conj(Integrate(IlinminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-8)[1])
+            ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-6)[1]
+            ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-6)[1])
+            ℋlinplusSchw= Integrate(HlinplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-6)[1]
+            ℋlinminusSchw= conj(Integrate(HlinminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-6)[1])
+            ℐlinplusSchw= Integrate(IlinplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-6)[1]
+            ℐlinminusSchw= conj(Integrate(IlinminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-6)[1])
             ω2s=Computeω2(∂ω𝒪plusSchw,∂ω𝒪minusSchw,ℋlinplusSchw,ℋlinminusSchw,ℐlinplusSchw,ℐlinminusSchw,ψ)
             @show ω2s
 
-            push!(freqpertsmatrix, (l, m, n, a, real(ω2s[1]),imag(ω2s[1]),real(ω2s[2]),imag(ω2s[2])))
+            push!(freqpertsmatrix, (l, m, n, a, ω2s[1], ω2s[3], ω2s[2], ω2s[4]))
         end
     end
 
-    CSV.write("/home/dgw763/Documents/LinearizedSpin/SpectralitySplit/Eikonal.csv", freqpertsmatrix)
+    CSV.write("/home/dgw763/Documents/LinearizedSpin/SpectralitySplit/Eikonaln2.csv", freqpertsmatrix)
 end
 
-@testset "LinearizedJP220" begin
+@testset "LinearizedJP221" begin
 
     dwOfile = "/home/dgw763/Documents/LinearizedSpin/Operators/dwOcoefficients.csv"
     Hlinfile = "/home/dgw763/Documents/LinearizedSpin/Operators/Hlincoefficients.csv"
@@ -111,83 +111,85 @@ end
 
     println("Made operator shifts")
 
-    freqpertsmatrix220 =DataFrame(l = Int[], m = Int[], n = Int[], a = Float64[] ,ϵ = Float64[], value = ComplexF64[])
     l=2
     m=2
-    n=0
-
-    for a in [0.0, 0.02, 0.04, 0.06, 0.08, 0.1]
-        ψ = qnmfunctionnew(-2,l,m,n,a)
-        ψconj = qnmfunctionnew(-2,l,m,n,a,is_conjugate=true)
-        ψm = qnmfunctionnew(-2,l,m,n,a,is_minus=true)
-        ψmconj = qnmfunctionnew(-2,l,m,n,a,is_minus=true,is_conjugate=true)
-        # Compile ψ
-        ψ(1,.5)
-        println("Past ψ compile")
-        Σ = let a= ψ.a
-            (r,z) -> Complex(r)^2+a^2*z^2
-        end
-        Δ = let a= ψ.a
-            (r,z) -> Complex(r)^2+a^2-2*r
-        end
-        ζ = let a= ψ.a
-            (r,z) -> r-im*a*z
-        end
-        weight = let a= ψ.a
-            (r,z) ->8*ζ(r,z)^(4)*Σ(r,z)/((Δ(r,z))^2)
-        end
-    
-        ## Define the useful contours
-        r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
-    
-        #The upwards pointing contour
-        point1up = r₊ + Δr - Δr*im
-        point2up = r₊ - Δr - Δr*im
-        radial1up = SemiInfiniteLine(point1up , point1up + Δr*im , false)
-        angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
-        C1up = radial1up ⊗ angular
-        radial2up = LineSegment(point1up,point2up,true)
-        C2up = radial2up ⊗ angular
-        radial3up = SemiInfiniteLine(point2up , point2up + Δr*im , true)
-        C3up = radial3up ⊗ angular
-        TheContourup = C1up⊕C2up⊕C3up
-    
-        #The downwards pointing contour
-        point1down = r₊ + Δr + Δr*im
-        point2down = r₊ - Δr + Δr*im
-        radial1down = SemiInfiniteLine(point1down , point1down - Δr*im , false)
-        angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
-        C1down = radial1down ⊗ angular
-        radial2down = LineSegment(point1down,point2down,true)
-        C2down = radial2down ⊗ angular
-        radial3down = SemiInfiniteLine(point2down , point2down - Δr*im , true)
-        C3down = radial3down ⊗ angular
-        TheContourdown = C1down⊕C2down⊕C3down
-        ∂ωOplusSchw = OperatorSandwich(ψ,∂ωO,weight,ψ).Op
-        ∂ωOminusSchw = OperatorSandwich(ψm,∂ωO,weight,ψm).Op
-        println("Done ∂ωO's")
-        HlinplusSchw = OperatorSandwich(ψ,Hlin,weight,ψ).Op
-        HlinminusSchw = OperatorSandwich(ψm,Hlin,weight,ψm).Op
-        println("Done Hlin's")
-        IlinplusSchw = OperatorSandwich(ψ,Ilin,weight,ψmconj).Op
-        IlinminusSchw = OperatorSandwich(ψm,Ilin,weight,ψconj).Op
-        println("Done I's")
-        println("Made Operators")
-        for pert_ϵ_iter in 1:10
-            pert_ϵ=.01*pert_ϵ_iter
-            ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-6)[1]
-            ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-6)[1])
-            ℋlinplusSchw= Integrate(HlinplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-6)[1]
-            ℋlinminusSchw= conj(Integrate(HlinminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-6)[1])
-            ℐlinplusSchw= Integrate(IlinplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-6)[1]
-            ℐlinminusSchw= conj(Integrate(IlinminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-6)[1])
-            ω2s=Computeω2(∂ω𝒪plusSchw,∂ω𝒪minusSchw,ℋlinplusSchw,ℋlinminusSchw,ℐlinplusSchw,ℐlinminusSchw,ψ)
-            @show ω2s[1],pert_ϵ
-            push!(freqpertsmatrix220, (l, m, n, a, pert_ϵ, ω2s[1]))
-        end
+    n=1
+    a=0.
+    ψ = qnmfunctionnew(-2,l,m,n,a)
+    ψconj = qnmfunctionnew(-2,l,m,n,a,is_conjugate=true)
+    ψm = qnmfunctionnew(-2,l,m,n,a,is_minus=true)
+    ψmconj = qnmfunctionnew(-2,l,m,n,a,is_minus=true,is_conjugate=true)
+    # Compile ψ
+    ψ(1,.5)
+    println("Past ψ compile")
+    Σ = let a= ψ.a
+        (r,z) -> Complex(r)^2+a^2*z^2
+    end
+    Δ = let a= ψ.a
+        (r,z) -> Complex(r)^2+a^2-2*r
+    end
+    ζ = let a= ψ.a
+        (r,z) -> r-im*a*z
+    end
+    weight = let a= ψ.a
+        (r,z) ->8*ζ(r,z)^(4)*Σ(r,z)/((Δ(r,z))^2)
     end
 
-    CSV.write("/home/dgw763/Documents/LinearizedSpin/freqpertsmatrix220.csv", freqpertsmatrix220)
+    ## Define the useful contours
+    r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
+
+    #The upwards pointing contour
+    point1up = r₊ + Δr - Δr*im
+    point2up = r₊ - Δr - Δr*im
+    radial1up = SemiInfiniteLine(point1up , point1up + Δr*im , false)
+    angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+    C1up = radial1up ⊗ angular
+    radial2up = LineSegment(point1up,point2up,true)
+    C2up = radial2up ⊗ angular
+    radial3up = SemiInfiniteLine(point2up , point2up + Δr*im , true)
+    C3up = radial3up ⊗ angular
+    TheContourup = C1up⊕C2up⊕C3up
+
+    #The downwards pointing contour
+    point1down = r₊ + Δr + Δr*im
+    point2down = r₊ - Δr + Δr*im
+    radial1down = SemiInfiniteLine(point1down , point1down - Δr*im , false)
+    angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+    C1down = radial1down ⊗ angular
+    radial2down = LineSegment(point1down,point2down,true)
+    C2down = radial2down ⊗ angular
+    radial3down = SemiInfiniteLine(point2down , point2down - Δr*im , true)
+    C3down = radial3down ⊗ angular
+    TheContourdown = C1down⊕C2down⊕C3down
+    ∂ωOplusSchw = OperatorSandwich(ψ,∂ωO,weight,ψ).Op
+    ∂ωOminusSchw = OperatorSandwich(ψm,∂ωO,weight,ψm).Op
+    println("Done ∂ωO's")
+    HlinplusSchw = OperatorSandwich(ψ,Hlin,weight,ψ).Op
+    HlinminusSchw = OperatorSandwich(ψm,Hlin,weight,ψm).Op
+    println("Done Hlin's")
+    IlinplusSchw = OperatorSandwich(ψ,Ilin,weight,ψmconj).Op
+    IlinminusSchw = OperatorSandwich(ψm,Ilin,weight,ψconj).Op
+    println("Done I's")
+    println("Made Operators")
+    
+    pert_ϵ=1
+    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-7)[1]
+    ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-7)[1])
+    ℋlinplusSchw= Integrate(HlinplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-7)[1]
+    ℋlinminusSchw= conj(Integrate(HlinminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-7)[1])
+    ℐlinplusSchw= Integrate(IlinplusSchw, TheContourup,pertparam=pert_ϵ,abstol=1e-7)[1]
+    ℐlinminusSchw= conj(Integrate(IlinminusSchw, TheContourdown,pertparam=pert_ϵ,abstol=1e-7)[1])
+
+    @show ∂ω𝒪plusSchw
+    @show ∂ω𝒪minusSchw
+    @show ℋlinplusSchw
+    @show ℋlinminusSchw
+    @show ℐlinplusSchw
+    @show ℐlinminusSchw
+
+    ω2s=Computeω2(∂ω𝒪plusSchw,∂ω𝒪minusSchw,ℋlinplusSchw,ℋlinminusSchw,ℐlinplusSchw,ℐlinminusSchw,ψ)
+    @show ω2s
+    
 end
 
 @testset "LinearizedJPMany" begin
