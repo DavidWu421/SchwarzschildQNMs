@@ -1,5 +1,5 @@
 Index,Coefficient
-00,(8 * im * M - 2 * r .^ 2 .* conj(omega) - 4 * im * r) ./ (2 * M .* r - r .^ 2)
+00,(-6 * im * M + r .* (-omega .* r + 2im)) ./ (r .^ 5 .* (-2 * M + r))
 01,0
 02,0
 03,0
