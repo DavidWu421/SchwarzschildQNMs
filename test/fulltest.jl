@@ -450,106 +450,110 @@ end
 
 end
 
-@testset "KerrNewmanpert" begin
+@testset "KerrNewmanpertp2" begin
 
-    dqHfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/Final/Faster/KerrNewman/dqHm2coefficients.csv"
-    dwHfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/Final/Faster/KerrNewman/dwHm2coefficients.csv"
-    # Ofile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/Final/Faster/KerrNewman/Om2coefficients.csv"
-    # OSchwfile = "C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/Final/Faster/KerrNewman/SchwarzschildNewman/Om2Schwcoefficients.csv"
+    dqHfile = "C:/Users/dwuuu/Documents/UT Academics/Research/RingdownDataAnalysis/ChargedQNMs/dqHp2coefficients.csv"
+    dwHfile = "C:/Users/dwuuu/Documents/UT Academics/Research/RingdownDataAnalysis/ChargedQNMs/dwHp2coefficients.csv"
 
     ∂qH = OperatorShift(dqHfile)
     ∂ωH = OperatorShift(dwHfile)
-    # O = OperatorShift(Ofile)
-    # SchwO = OperatorShift(OSchwfile)
 
     println("Made operator shifts")
-
-    freqpertsmatrix =DataFrame(l = Int[], m = Int[], n = Int[], a = Float64[], q = Float64[], value = ComplexF64[])
-    lmax=5
-
-    for l in 2:2
-        for m in 2:2
-            for n in 0:0
-                for a in range(0, stop=0.6, step=0.15)
-                    ψ = qnmfunctionnew(-2,l,m,n,a)
-
-                    # Compile ψ
-                    ψ(1,.5)
-                    println("Past ψ compile")
-
-                    Σ = let a= ψ.a
-                        (r,z) -> Complex(r)^2+a^2*z^2
-                    end
-                    Δ = let a= ψ.a
-                        (r,z) -> Complex(r)^2+a^2-2*r
-                    end
-                    ζ = let a= ψ.a
-                        (r,z) -> r-im*a*z
-                    end
-                    weight = let a= ψ.a
-                        (r,z) ->8*ζ(r,z)^(4)*Σ(r,z)/((Δ(r,z))^2)
-                    end
-                
-                    ## Define the useful contours
-                    r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
-                
-                    #The upwards pointing contour
-                    point1up = r₊ + Δr - Δr*im
-                    point2up = r₊ - Δr - Δr*im
-                    radial1up = SemiInfiniteLine(point1up , point1up + Δr*im , false)
-                    angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
-                    C1up = radial1up ⊗ angular
-                    radial2up = LineSegment(point1up,point2up,true)
-                    C2up = radial2up ⊗ angular
-                    radial3up = SemiInfiniteLine(point2up , point2up + Δr*im , true)
-                    C3up = radial3up ⊗ angular
-                    TheContourup = C1up⊕C2up⊕C3up
-                
-                    #The downwards pointing contour
-                    point1down = r₊ + Δr + Δr*im
-                    point2down = r₊ - Δr + Δr*im
-                    radial1down = SemiInfiniteLine(point1down , point1down - Δr*im , false)
-                    angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
-                    C1down = radial1down ⊗ angular
-                    radial2down = LineSegment(point1down,point2down,true)
-                    C2down = radial2down ⊗ angular
-                    radial3down = SemiInfiniteLine(point2down , point2down - Δr*im , true)
-                    C3down = radial3down ⊗ angular
-                    TheContourdown = C1down⊕C2down⊕C3down
-
-                    ∂qHm2 = OperatorSandwich(ψ,∂qH,weight,ψ).Op
-                    ∂ωHm2 = OperatorSandwich(ψ,∂ωH,weight,ψ).Op
-                    # Om2 = OperatorSandwich(ψ,O,weight,ψ).Op
-                    # SchwOm2 = OperatorSandwich(ψ,SchwO,weight,ψ).Op
-
-                    println("Made Operators")
-                
-                    @show ∂qHm2(8+im,0.6)
-                    @show ∂ωHm2(8+im,0.6)
-                    # @show Om2(8+im,0.6)
-                    # @show SchwOm2(8+im,0.6)
-                
-                    println("Complied Operators")
-                
-                    ∂qℋm2 = Integrate(∂qHm2, TheContourup,abstol=1e-6)[1]
-                    ∂ωℋm2 = Integrate(∂ωHm2, TheContourup,abstol=1e-6)[1]
-                    # 𝒪m2 = Integrate(Om2, TheContourup,pertparam=pert_q,abstol=1e-6)[1]
-                    # Kerr𝒪m2 = Integrate(KerrOm2, TheContourup,pertparam=pert_q,abstol=1e-6)[1]
-                
-                    ωcorrec= -(∂qℋm2/∂ωℋm2)
-
-                    for pert_q_iter in 1:3
-
-                        pert_q=.1*pert_q_iter
-                        
-                        push!(freqpertsmatrix, (l, m, n, a, pert_q, ωcorrec*pert_q))                        
-                    end
-                end
-            end
-        end
-    end
     
-    CSV.write("C:/Users/dwuuu/Documents/UT Academics/Research/Ringdown/Mathematica/Final/Faster/KerrNewman/juliafreqpertsmatrix.csv", freqpertsmatrix)
+    ψ = qnmfunctionnew(2,2,2,0,0.)
+
+    # Compile ψ
+    ψ(1,.5)
+    println("Past ψ compile")
+
+    ## Define the useful contours
+    r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
+
+    # Define the Weight from Mark 2014
+    weight = let a= ψ.a
+        (r,z) ->(r-r₊)^s * (r-r₋)^s  
+    end
+
+    #The upwards pointing contour
+    point1up = r₊ + Δr - Δr*im
+    point2up = r₊ - Δr - Δr*im
+    radial1up = SemiInfiniteLine(point1up , point1up + Δr*im , false)
+    angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+    C1up = radial1up ⊗ angular
+    radial2up = LineSegment(point1up,point2up,true)
+    C2up = radial2up ⊗ angular
+    radial3up = SemiInfiniteLine(point2up , point2up + Δr*im , true)
+    C3up = radial3up ⊗ angular
+    TheContourup = C1up⊕C2up⊕C3up
+
+
+    # Make the operators
+    ∂qHp2 = OperatorSandwich(ψ,∂qH,weight,ψ).Op
+    ∂ωHp2 = OperatorSandwich(ψ,∂ωH,weight,ψ).Op
+    println("Made Operators")
+
+    @show ∂qHp2(8+im,0.6)
+    @show ∂ωHp2(8+im,0.6)
+
+    println("Complied Operators")
+
+    ∂qℋp2 = Integrate(∂qHp2, TheContourup,abstol=1e-6)[1]
+    ∂ωℋp2 = Integrate(∂ωHp2, TheContourup,abstol=1e-6)[1]
+
+    @show δω = -(∂qℋp2/∂ωℋp2)
+end
+
+@testset "KerrNewmanpertm2" begin
+
+    dqHfile = "C:/Users/dwuuu/Documents/UT Academics/Research/RingdownDataAnalysis/ChargedQNMs/dqHm2coefficients.csv"
+    dwHfile = "C:/Users/dwuuu/Documents/UT Academics/Research/RingdownDataAnalysis/ChargedQNMs/dwHm2coefficients.csv"
+
+    ∂qH = OperatorShift(dqHfile)
+    ∂ωH = OperatorShift(dwHfile)
+
+    println("Made operator shifts")
+    
+    ψ = qnmfunctionnew(-2,2,2,0,0.)
+
+    # Compile ψ
+    ψ(1,.5)
+    println("Past ψ compile")
+
+    ## Define the useful contours
+    r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
+
+    # Define the Weight from Mark 2014
+    weight = let a= ψ.a
+        (r,z) ->(r-r₊)^s * (r-r₋)^s 
+    end
+
+    #The upwards pointing contour
+    point1up = r₊ + Δr - Δr*im
+    point2up = r₊ - Δr - Δr*im
+    radial1up = SemiInfiniteLine(point1up , point1up + Δr*im , false)
+    angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+    C1up = radial1up ⊗ angular
+    radial2up = LineSegment(point1up,point2up,true)
+    C2up = radial2up ⊗ angular
+    radial3up = SemiInfiniteLine(point2up , point2up + Δr*im , true)
+    C3up = radial3up ⊗ angular
+    TheContourup = C1up⊕C2up⊕C3up
+
+
+    # Make the operators
+    ∂qHm2 = OperatorSandwich(ψ,∂qH,weight,ψ).Op
+    ∂ωHm2 = OperatorSandwich(ψ,∂ωH,weight,ψ).Op
+    println("Made Operators")
+
+    @show ∂qHm2(8+im,0.6)
+    @show ∂ωHm2(8+im,0.6)
+
+    println("Complied Operators")
+
+    ∂qℋm2 = Integrate(∂qHm2, TheContourup,abstol=1e-6)[1]
+    ∂ωℋm2 = Integrate(∂ωHm2, TheContourup,abstol=1e-6)[1]
+
+    @show δω = -(∂qℋm2/∂ωℋm2)
 end
 
 @testset "FinalTestMany" begin
@@ -970,9 +974,6 @@ end
     @show -(δ𝒪plusKerr/∂ω𝒪plusSchw)
     @show δ𝒪minusKerr/∂ω𝒪minusSchw
 end
-
-
-
 
 @testset "FullTest" begin
     pert_a=.01
