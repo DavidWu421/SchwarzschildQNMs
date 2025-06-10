@@ -8,11 +8,9 @@ println("Done usings")
 
 @testset "ScalarLinearizedJP" begin   #CHECKED AND GOOD
 
-    Ofile = "./OperatorShifts/ScalarLinearizedJP/ScalarOcoefficients.csv"
     dwOfile = "./OperatorShifts/ScalarLinearizedJP/dwscalarOcoefficients.csv"
     dϵOfile = "./OperatorShifts/ScalarLinearizedJP/δscalarOcoefficients.csv"
 
-    O = OperatorShift(Ofile)
     ∂ϵO = OperatorShift(dϵOfile)
     ∂ωO = OperatorShift(dwOfile)
 
@@ -60,6 +58,62 @@ println("Done usings")
 
     @show δω = -(∂q𝒪m2/∂ω𝒪m2)
 end
+
+@testset "ScalarLinearizedJPMany" begin   #CHECKED AND GOOD
+
+    dwOfile = "./OperatorShifts/ScalarLinearizedJP/dwscalarOcoefficients.csv"
+    dϵOfile = "./OperatorShifts/ScalarLinearizedJP/δscalarOcoefficients.csv"
+
+    ∂ϵO = OperatorShift(dϵOfile)
+    ∂ωO = OperatorShift(dwOfile)
+
+    println("Made operator shifts")
+
+    freqpertsmatrix =DataFrame(l = Int[], m = Int[], n = Int[], a = Float64[] , δω = ComplexF64[])
+    lmax=8
+
+    for l in 2:lmax
+        m=l
+        for n in 0:2
+            for a in [0.0]
+                ψ = qnmfunctionnew(0,l,m,n,a)
+                # Compile ψ
+                ψ(1,.5)
+                println("Past ψ compile")
+                ## Define the useful contours
+                r₊ = ψ.R.r₊ ; r₋ = ψ.R.r₋ ; s = ψ.s ; Δr = 0.1*(r₊-r₋); ϵ = eps(0.1);
+                # Define the Weight
+                Σ = let a= ψ.a
+                    (r,z) -> Complex(r)^2+a^2*z^2
+                end
+                weight = let a= ψ.a
+                    (r,z) ->Σ(r,z)
+                end
+                #The upwards pointing contour
+                point1up = r₊ + Δr - Δr*im
+                point2up = r₊ - Δr - Δr*im
+                radial1up = SemiInfiniteLine(point1up , point1up + Δr*im , false)
+                angular = LineSegment(-1.0+100*ϵ , 1.0-100*ϵ , true) #to avoid the NaNs at the edges
+                C1up = radial1up ⊗ angular
+                radial2up = LineSegment(point1up,point2up,true)
+                C2up = radial2up ⊗ angular
+                radial3up = SemiInfiniteLine(point2up , point2up + Δr*im , true)
+                C3up = radial3up ⊗ angular
+                TheContourup = C1up⊕C2up⊕C3up
+                # Make the operators
+                ∂ϵOm2 = OperatorSandwich(ψ,∂ϵO,weight,ψ).Op
+                ∂ωOm2 = OperatorSandwich(ψ,∂ωO,weight,ψ).Op
+                println("Made Operators")
+                ∂ϵ𝒪m2 = Integrate(∂ϵOm2, TheContourup,abstol=1e-6)[1]
+                ∂ω𝒪m2 = Integrate(∂ωOm2, TheContourup,abstol=1e-6)[1]
+                @show δω = -(∂ϵ𝒪m2/∂ω𝒪m2)
+                push!(freqpertsmatrix, (l, m, n, a, δω))
+            end
+        end
+    end
+    CSV.write("/home/dgw763/Documents/LinearizedSpin/ScalarPerturbations/freqpertsmatrix.csv", freqpertsmatrix)
+end
+
 
 @testset "KerrNewmanpertm2Fitting" begin
 
