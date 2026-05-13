@@ -1,0 +1,5 @@
+Index,Coefficient
+00,2 * m .* omega .* rho^4 ./ mu
+01,0
+10,0
+11,0

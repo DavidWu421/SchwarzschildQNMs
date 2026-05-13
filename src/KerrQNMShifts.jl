@@ -15,6 +15,7 @@ include("ImportExpressionsFromFile.jl")
 include("OperatorShiftType.jl")
 include("OperatorSandwichType.jl")
 include("ConstructFreqPerturbation.jl")
+include("NPScalars.jl")
 
 
 export qnm, qnmfunctionnew, importqnm

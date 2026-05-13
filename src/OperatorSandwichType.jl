@@ -29,7 +29,13 @@ function OperatorSandwich(ψL,OpShift::OperatorShift,weight,ψ)
         
         FF = let a = ψ.a, m = m ,ω = ω ,s = ψ.s, ψ=ψ, ψL=ψL, Ops=Ops,ψ01=ψ01,ψ10=ψ10,ψ11=ψ11, weight=weight
         function F(r,z; pertparam=0)
-            ψL(r,z)*Ops(r,z,a,m,ω,s,ψ,ψ01,ψ10,ψ11; pertparam=pertparam)*weight(r,z)
+            ρ=rho(r,z,a)
+            fd=fdagger(r,z,a,ρ)
+            β=beta(z,ρ,fd)
+            τ=tau(z,a,ρ,fd)
+            μ=mu(r,a,ρ,fd)
+            ξ=xi(r,z,a,ρ,fd)
+            ψL(r,z)*Ops(r,z,a,m,ω,s,ρ,fd,β,τ,μ,ξ,ψ,ψ01,ψ10,ψ11; pertparam=pertparam)*weight(r,z)
         end
     end
     

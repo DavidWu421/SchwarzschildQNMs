@@ -8,8 +8,10 @@ println("Done usings")
 
 @testset "ScalarKerrPertToSchw" begin   #CHECKED AND GOOD
 
-    dwOfile = "./OperatorShifts/OrderReducedShifts/dwscalarOcoefficients.csv"
-    dϵOfile = "./OperatorShifts/OrderReducedShifts/δscalarOcoefficients.csv"
+    # dwOfile = "./OperatorShifts/OrderReducedShifts/dwscalarOcoefficients.csv"
+    # dϵOfile = "./OperatorShifts/OrderReducedShifts/δscalarOcoefficients.csv"
+    dwOfile = "./OperatorShifts/OrderReducedShifts/NPdwscalarOcoefficients.csv"
+    dϵOfile = "./OperatorShifts/OrderReducedShifts/NPδscalarOcoefficients.csv"
 
     ∂ϵO = OperatorShift(dϵOfile)
     ∂ωO = OperatorShift(dwOfile)

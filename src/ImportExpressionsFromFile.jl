@@ -25,7 +25,7 @@ end
 
 function MakeOp(file)
     thisexpr = GetExprMetric(file)
-    Op = eval(Meta.parse("((r,x,a,m,ω,s,ψ00,ψ01,ψ10,ψ11; pertparam=0, M=1) -> $thisexpr)"))
+    Op = eval(Meta.parse("((r,x,a,m,ω,s,ρ,fd,β,τ,μ,ξ,ψ00,ψ01,ψ10,ψ11; pertparam=0, M=1) -> $thisexpr)"))
     # println(thisexpr)
     Op
 end
