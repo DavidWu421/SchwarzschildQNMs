@@ -9,11 +9,12 @@ function GetExprMetric(file)
         # d = replace(d,"th"=>"θ")
         f = replace(f,
             "omega" => "ω",
-            "rho"   => "ρ",
-            "beta"  => "β",
-            "tau"   => "τ",
-            "mu"    => "μ",
-            "xi"    => "ξ"
+            "rho"   => "NPvars.ρ",
+            "fdagger" => "NPvars.fd",
+            "beta"  => "NPvars.β",
+            "tau"   => "NPvars.τ",
+            "mu"    => "NPvars.μ",
+            "xi"    => "NPvars.ξ"
         )
         ps = "ψ"*d
         push!(exprs,"($f)*$(ps)(r,x)")
@@ -25,7 +26,7 @@ end
 
 function MakeOp(file)
     thisexpr = GetExprMetric(file)
-    Op = eval(Meta.parse("((r,x,a,m,ω,s,ρ,fd,β,τ,μ,ξ,ψ00,ψ01,ψ10,ψ11; pertparam=0, M=1) -> $thisexpr)"))
+    Op = eval(Meta.parse("((r,x,a,m,ω,s,NPvars,ψ00,ψ01,ψ10,ψ11; pertparam=0, M=1) -> $thisexpr)"))
     # println(thisexpr)
     Op
 end
