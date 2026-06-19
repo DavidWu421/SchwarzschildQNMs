@@ -27,10 +27,10 @@ function OperatorSandwich(ψL,OpShift::OperatorShift,weight,ψ)
         ω = ψ.is_conjugate ? -conj(ψ.ω) : ψ.ω
         m = ψ.is_conjugate ? -ψ.m : ψ.m
         
-        FF = let a = ψ.a, m = m ,ω = ω ,s = ψ.s, ψ=ψ, ψL=ψL, Ops=Ops,ψ01=ψ01,ψ10=ψ10,ψ11=ψ11, weight=weight
+        FF = let a = ψ.a, m = m ,ω = ω ,s = ψ.s, λ=ψ.Alm+a^2*ω^2-2*a*m*ω, ψ=ψ, ψL=ψL, Ops=Ops,ψ01=ψ01,ψ10=ψ10,ψ11=ψ11, weight=weight
         function F(r,z; pertparam=0)
             NPvars = NP_vars(r,z,a)
-            ψL(r,z)*Ops(r,z,a,m,ω,s,NPvars,ψ,ψ01,ψ10,ψ11; pertparam=pertparam)*weight(r,z)
+            ψL(r,z)*Ops(r,z,a,m,ω,s,λ,NPvars,ψ,ψ01,ψ10,ψ11; pertparam=pertparam)*weight(r,z)
         end
     end
     
