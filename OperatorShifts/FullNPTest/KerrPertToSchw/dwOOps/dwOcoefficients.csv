@@ -1,0 +1,5 @@
+Index,Coefficient
+00,(-a .^ 2 .* omega .* x .^ 2 .* (a .^ 2 + r .* (r - 2)) + a .^ 2 .* (-omega .* r .^ 2 - 2 * r .* (omega - 1im) + 2im) + 2 * a .* m .* r - 2 * a .* x .* (a .^ 2 + r .* (r - 2)) - r .^ 2 .* (omega .* r .^ 2 - 2 * im * r + 6im)) ./ ((a .^ 2 + r .* (r - 2)) .* (a .* x - im * r) .* (a .* x + im * r) .^ 5)
+01,0
+10,0
+11,0

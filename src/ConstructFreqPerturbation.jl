@@ -69,7 +69,7 @@ function Computeω2(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     ω1=-((As[1]*HplusInt+conj(Bs[1])IplusInt)/∂ωOplusInt)
     ω2=-((As[2]*HplusInt+conj(Bs[2])IplusInt)/∂ωOplusInt)
 
-    if imag(ω1)>imag(ω2)
+    if real(γs[1])>real(γs[2])
         ωs=(ω1,ω2,γs[1],γs[2])
     else
         ωs=(ω2,ω1,γs[2],γs[1])

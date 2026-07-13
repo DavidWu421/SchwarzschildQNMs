@@ -1,5 +1,0 @@
-Index,Coefficient
-00,im * rho .^ 3 .* (-16 * bet .* tau ./ fd + rho .^ 2 .* (fd - 4)) - rho .^ 2 .* (rho .^ 2 - 2 * tau .^ 2 ./ fd) .* (-a .* m + omega .* (a .^ 2 + r .^ 2)) ./ (a .^ 2 + r .* (r - 2)) + 2 * rho .^ 3 .* tau .* (a .* omega .* (x .^ 2 - 1) + m) ./ (fd .* sqrt(2 - 2 * x .^ 2) .* (a .* x - im * r))
-01,-sqrt(2) * im * rho .^ 3 .* tau ./ (fd .* (im * a .* x + r))
-10,-im * rho .^ 2 .* (rho .^ 2 - 2 * tau .^ 2 ./ fd)
-11,0
