@@ -911,14 +911,14 @@ end
 
     println("Made Operators")
 
-    𝒪plusSchw= Integrate(OSchw1, TheContourup,pertparam=pert_a,abstol=1e-6)[1]
-    𝒪minusSchw= conj(Integrate(OSchw2, TheContourdown,pertparam=pert_a,abstol=1e-6)[1])
-    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContourup,pertparam=pert_a,abstol=1e-6)[1]
-    ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContourdown,pertparam=pert_a,abstol=1e-6)[1])
-    ℋplusSchw= Integrate(HplusSchw, TheContourup,pertparam=pert_a,abstol=1e-6)[1]
-    ℋminusSchw= conj(Integrate(HminusSchw, TheContourdown,pertparam=pert_a,abstol=1e-6)[1])
-    ℐplusSchw= Integrate(IplusSchw, TheContourup,pertparam=pert_a,abstol=1e-6)[1]
-    ℐminusSchw= conj(Integrate(IminusSchw, TheContourdown,pertparam=pert_a,abstol=1e-6)[1])
+    𝒪plusSchw= Integrate(OSchw1, TheContourup,pertparam=pert_a,abstol=1e-4)[1]
+    𝒪minusSchw= conj(Integrate(OSchw2, TheContourdown,pertparam=pert_a,abstol=1e-4)[1])
+    ∂ω𝒪plusSchw= Integrate(∂ωOplusSchw, TheContourup,pertparam=pert_a,abstol=1e-4)[1]
+    ∂ω𝒪minusSchw= conj(Integrate(∂ωOminusSchw, TheContourdown,pertparam=pert_a,abstol=1e-4)[1])
+    ℋplusSchw= Integrate(HplusSchw, TheContourup,pertparam=pert_a,abstol=1e-4)[1]
+    ℋminusSchw= conj(Integrate(HminusSchw, TheContourdown,pertparam=pert_a,abstol=1e-4)[1])
+    ℐplusSchw= Integrate(IplusSchw, TheContourup,pertparam=pert_a,abstol=1e-4)[1]
+    ℐminusSchw= conj(Integrate(IminusSchw, TheContourdown,pertparam=pert_a,abstol=1e-4)[1])
     
     ω2s=Computeω2(∂ω𝒪plusSchw,∂ω𝒪minusSchw,ℋplusSchw,ℋminusSchw,ℐplusSchw,ℐminusSchw,ψ)
     @show ω2s
