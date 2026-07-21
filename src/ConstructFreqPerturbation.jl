@@ -60,9 +60,10 @@ function Computeω2(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     Dplus=ComputeDplus(ψ)
     𝒞plus= Compute𝒞plus(ψ,Dplus)
     γs=Computeγs(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,IminusInt,Dplus,ψ.m,ψ.ω)
-    if all(z -> isnan(real(z)) && isnan(imag(z)), γs)
-        γs=(2,1)
-    end
+    # if all(z -> isnan(real(z)) && isnan(imag(z)), γs)
+    #     println("TRIGGERS")
+    #     γs=(2,1)
+    # end
     As=ComputeAs(𝒞plus,Dplus,ψ,γs)
     Bs= ComputeBs(𝒞plus,Dplus,ψ,γs)
 

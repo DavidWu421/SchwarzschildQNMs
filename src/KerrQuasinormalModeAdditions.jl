@@ -18,6 +18,12 @@ function qnmfunctionnew(s,l,m,n,a; qnm=qnm,is_conjugate=false,is_minus=false)
         Alm=conj(Alm)
         Cllʼ=[i % 2 == 0 ? -x : x for (i, x) in enumerate(Cllʼ)]
         Cllʼ=(-1)^l*conj.(Cllʼ)
+        # The following if statement might be buggy for s!=-2,0. It's needed because of how the
+        # Cllʼ are indexed in the SpinWeightedSpheroidal of the KerrQuasinormalModes package. In particular
+        # how the max(abs(s),abs(m)) condition triggers.
+        if (abs(m)<abs(s)) & (isodd(abs(m)))
+            Cllʼ=-Cllʼ
+        end
     end
     if is_conjugate==true
         Alm=conj(Alm)
