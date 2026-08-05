@@ -1,3 +1,5 @@
+# To run this file, run <nohup stdbuf -oL -eL julia ./test/runtest.jl > lmn.log 2>&1 &> in the base directory
+
 using ContourIntegrals
 using KerrQNMShifts
 using KerrQuasinormalModes
@@ -52,18 +54,20 @@ println("Made operator shifts")
 
 freqpertsmatrix =DataFrame(l = Int[], m = Int[], n = Int[], a = Float64[] , δωE = ComplexF64[], γE = ComplexF64[], δωO = ComplexF64[], γO = ComplexF64[])
 
-l=10
-m=10
+l=9
+m=9
 n=0
 
 reltol=1e-4
 abstol=1e-8
 
-filename = "/home/dgw763/Documents/bGRQNMs/JPPertToKerr/QNMShifts/AdaptiveRefinement/JPShifts" * string(l, m, n) * ".csv"
+filename = "/home/dgw763/Documents/bGRQNMs/JPPertToKerr/QNMShifts/AdaptiveRefinement/JPShifts" * string(l, m, n) * "Test.csv"
     
 for a in collect(0.0+1e-8:0.01:1.0)
 
     println(l,", ",m,", ",n,", ",a)
+
+    flush(stdout)
 
     ψ = qnmfunctionnew(-2,l,m,n,a)
     ψm = qnmfunctionnew(-2,l,m,n,a, is_minus=true)
@@ -130,9 +134,9 @@ for a in collect(0.0+1e-8:0.01:1.0)
     H4Bplus = OperatorSandwich(ψ,H4B,weight,ψ).Op
     H10plus = OperatorSandwich(ψ,H10,weight,ψ).Op
 
-    function Hplus(r,z; pertparam=0)
-        H1Aplus(r,z; pertparam=0)+H1Bplus(r,z; pertparam=0)+H2Aplus(r,z; pertparam=0)+H2Bplus(r,z; pertparam=0)+H3Aplus(r,z; pertparam=0)+H3Bplus(r,z; pertparam=0)+H4Aplus(r,z; pertparam=0)+H4Bplus(r,z; pertparam=0)+H10plus(r,z; pertparam=0)
-    end
+    # function Hplus(r,z; pertparam=0)
+    #     H1Aplus(r,z; pertparam=0)+H1Bplus(r,z; pertparam=0)+H2Aplus(r,z; pertparam=0)+H2Bplus(r,z; pertparam=0)+H3Aplus(r,z; pertparam=0)+H3Bplus(r,z; pertparam=0)+H4Aplus(r,z; pertparam=0)+H4Bplus(r,z; pertparam=0)+H10plus(r,z; pertparam=0)
+    # end
 
     H1Aminus = OperatorSandwich(ψm,H1A,weight,ψm).Op
     H1Bminus = OperatorSandwich(ψm,H1B,weight,ψm).Op
@@ -144,9 +148,9 @@ for a in collect(0.0+1e-8:0.01:1.0)
     H4Bminus = OperatorSandwich(ψm,H4B,weight,ψm).Op
     H10minus = OperatorSandwich(ψm,H10,weight,ψm).Op
 
-    function Hminus(r,z; pertparam=0)
-        H1Aminus(r,z; pertparam=0)+H1Bminus(r,z; pertparam=0)+H2Aminus(r,z; pertparam=0)+H2Bminus(r,z; pertparam=0)+H3Aminus(r,z; pertparam=0)+H3Bminus(r,z; pertparam=0)+H4Aminus(r,z; pertparam=0)+H4Bminus(r,z; pertparam=0)+H10minus(r,z; pertparam=0)
-    end
+    # function Hminus(r,z; pertparam=0)
+    #     H1Aminus(r,z; pertparam=0)+H1Bminus(r,z; pertparam=0)+H2Aminus(r,z; pertparam=0)+H2Bminus(r,z; pertparam=0)+H3Aminus(r,z; pertparam=0)+H3Bminus(r,z; pertparam=0)+H4Aminus(r,z; pertparam=0)+H4Bminus(r,z; pertparam=0)+H10minus(r,z; pertparam=0)
+    # end
 
     I1Aplus = OperatorSandwich(ψ,I1A,weight,ψmconj).Op
     I1Bplus = OperatorSandwich(ψ,I1B,weight,ψmconj).Op
@@ -158,9 +162,9 @@ for a in collect(0.0+1e-8:0.01:1.0)
     I4Bplus = OperatorSandwich(ψ,I4B,weight,ψmconj).Op
     I10plus = OperatorSandwich(ψ,I10,weight,ψmconj).Op
 
-    function Iplus(r,z; pertparam=0)
-        I1Aplus(r,z; pertparam=0)+I1Bplus(r,z; pertparam=0)+I2Aplus(r,z; pertparam=0)+I2Bplus(r,z; pertparam=0)+I3Aplus(r,z; pertparam=0)+I3Bplus(r,z; pertparam=0)+I4Aplus(r,z; pertparam=0)+I4Bplus(r,z; pertparam=0)+I10plus(r,z; pertparam=0)
-    end
+    # function Iplus(r,z; pertparam=0)
+    #     I1Aplus(r,z; pertparam=0)+I1Bplus(r,z; pertparam=0)+I2Aplus(r,z; pertparam=0)+I2Bplus(r,z; pertparam=0)+I3Aplus(r,z; pertparam=0)+I3Bplus(r,z; pertparam=0)+I4Aplus(r,z; pertparam=0)+I4Bplus(r,z; pertparam=0)+I10plus(r,z; pertparam=0)
+    # end
 
     I1Aminus = OperatorSandwich(ψm,I1A,weight,ψconj).Op
     I1Bminus = OperatorSandwich(ψm,I1B,weight,ψconj).Op
@@ -172,11 +176,12 @@ for a in collect(0.0+1e-8:0.01:1.0)
     I4Bminus = OperatorSandwich(ψm,I4B,weight,ψconj).Op
     I10minus = OperatorSandwich(ψm,I10,weight,ψconj).Op
 
-    function Iminus(r,z; pertparam=0)
-        I1Aminus(r,z; pertparam=0)+I1Bminus(r,z; pertparam=0)+I2Aminus(r,z; pertparam=0)+I2Bminus(r,z; pertparam=0)+I3Aminus(r,z; pertparam=0)+I3Bminus(r,z; pertparam=0)+I4Aminus(r,z; pertparam=0)+I4Bminus(r,z; pertparam=0)+I10minus(r,z; pertparam=0)
-    end
+    # function Iminus(r,z; pertparam=0)
+    #     I1Aminus(r,z; pertparam=0)+I1Bminus(r,z; pertparam=0)+I2Aminus(r,z; pertparam=0)+I2Bminus(r,z; pertparam=0)+I3Aminus(r,z; pertparam=0)+I3Bminus(r,z; pertparam=0)+I4Aminus(r,z; pertparam=0)+I4Bminus(r,z; pertparam=0)+I10minus(r,z; pertparam=0)
+    # end
 
     println("Made Operators")
+    flush(stdout)
 
     # Upwards-facing contours
 
@@ -192,7 +197,7 @@ for a in collect(0.0+1e-8:0.01:1.0)
         ℋ10plus = Integrate(H10plus, TheContourup,reltol=reltol,abstol=abstol)[1]
         # ℋplus=Integrate(Hplus, TheContourup,reltol=1e-4, abstol=1e-13)[1]
         ℋplus = ℋ1Aplus+ℋ1Bplus+ℋ2Aplus+ℋ2Bplus+ℋ3Aplus+ℋ3Bplus+ℋ4Aplus+ℋ4Bplus+ℋ10plus
-        if abs(real(ℋplus))/abstol < 1e4 || abs(imag(ℋplus))/abstol < 1e4
+        if abs(real(ℋplus))/abstol < 1/reltol || abs(imag(ℋplus))/abstol < 1/reltol
             if depth >= max_depth
                 error("Reached maximum recursion depth ($max_depth). Try the group integration procedure.")
             end
@@ -214,7 +219,7 @@ for a in collect(0.0+1e-8:0.01:1.0)
         ℐ10plus = Integrate(I10plus, TheContourup,reltol=reltol,abstol=abstol)[1]
         # ℐplus=Integrate(Iplus, TheContourup,reltol=1e-4, abstol=1e-13)[1]
         ℐplus = ℐ1Aplus+ℐ1Bplus+ℐ2Aplus+ℐ2Bplus+ℐ3Aplus+ℐ3Bplus+ℐ4Aplus+ℐ4Bplus+ℐ10plus
-        if abs(real(ℐplus))/abstol < 1e4 || abs(imag(ℐplus))/abstol < 1e4
+        if abs(real(ℐplus))/abstol < 1/reltol || abs(imag(ℐplus))/abstol < 1/reltol
             if depth >= max_depth
                 error("Reached maximum recursion depth ($max_depth). Try the group integration procedure.")
             end
@@ -226,7 +231,7 @@ for a in collect(0.0+1e-8:0.01:1.0)
 
     function compute∂ω𝒪plus(reltol, abstol; depth=0, max_depth=5)
         ∂ω𝒪plus = Integrate(dwOplus, TheContourup,reltol=reltol, abstol=abstol)[1]
-        if abs(real(∂ω𝒪plus))/abstol < 1e4 || abs(imag(∂ω𝒪plus))/abstol < 1e4
+        if abs(real(∂ω𝒪plus))/abstol < 1/reltol || abs(imag(∂ω𝒪plus))/abstol < 1/reltol
             if depth >= max_depth
                 error("Reached maximum recursion depth ($max_depth). Try the group integration procedure.")
             end
@@ -250,7 +255,7 @@ for a in collect(0.0+1e-8:0.01:1.0)
         ℋ10minus = conj(Integrate(H10minus, TheContourdown,reltol=reltol,abstol=abstol)[1])
         # ℋminus=conj(Integrate(Hminus, TheContourdown,reltol=1e-4, abstol=1e-13)[1])
         ℋminus = ℋ1Aminus+ℋ1Bminus+ℋ2Aminus+ℋ2Bminus+ℋ3Aminus+ℋ3Bminus+ℋ4Aminus+ℋ4Bminus+ℋ10minus
-        if abs(real(ℋminus))/abstol < 1e4 || abs(imag(ℋminus))/abstol < 1e4
+        if abs(real(ℋminus))/abstol < 1/reltol || abs(imag(ℋminus))/abstol < 1/reltol
             if depth >= max_depth
                 error("Reached maximum recursion depth ($max_depth). Try the group integration procedure.")
             end
@@ -272,7 +277,7 @@ for a in collect(0.0+1e-8:0.01:1.0)
         ℐ10minus = conj(Integrate(I10minus, TheContourdown,reltol=reltol,abstol=abstol)[1])
         # ℐminus=conj(Integrate(Iminus, TheContourdown,reltol=1e-4, abstol=1e-13)[1])
         ℐminus = ℐ1Aminus+ℐ1Bminus+ℐ2Aminus+ℐ2Bminus+ℐ3Aminus+ℐ3Bminus+ℐ4Aminus+ℐ4Bminus+ℐ10minus
-        if abs(real(ℐminus))/abstol < 1e4 || abs(imag(ℐminus))/abstol < 1e4
+        if abs(real(ℐminus))/abstol < 1/reltol || abs(imag(ℐminus))/abstol < 1/reltol
             if depth >= max_depth
                 error("Reached maximum recursion depth ($max_depth). Try the group integration procedure.")
             end
@@ -284,7 +289,7 @@ for a in collect(0.0+1e-8:0.01:1.0)
 
     function compute∂ω𝒪minus(reltol, abstol; depth=0, max_depth=5)
         ∂ω𝒪minus = conj(Integrate(dwOminus, TheContourdown,reltol=reltol, abstol=abstol)[1])
-        if abs(real(∂ω𝒪minus))/abstol < 1e4 || abs(imag(∂ω𝒪minus))/abstol < 1e4
+        if abs(real(∂ω𝒪minus))/abstol < 1/reltol || abs(imag(∂ω𝒪minus))/abstol < 1/reltol
             if depth >= max_depth
                 error("Reached maximum recursion depth ($max_depth). Try the group integration procedure.")
             end
@@ -294,20 +299,43 @@ for a in collect(0.0+1e-8:0.01:1.0)
         return ∂ω𝒪minus
     end
 
-    ℋplus=computeℋplus(reltol,abstol)
-    println("Done ℋplus")
-    ℐplus=computeℐplus(reltol,abstol)
-    println("Done ℐplus")
-    ∂ω𝒪plus=compute∂ω𝒪plus(reltol,abstol)
-    println("Done  ∂ω𝒪plus")
-    ℋminus= computeℋminus(reltol,abstol)
-    println("Done  ℋminus")
-    ℐminus=computeℐminus(reltol,abstol)
-    println("Done  ℐminus")
-    ∂ω𝒪minus=compute∂ω𝒪minus(reltol,abstol)
-    println("Done  ∂ω𝒪minus")
+    function ComputeIntegrals(reltol,abstol; depth=0, max_depth=3)
+        ℋplus=computeℋplus(reltol,abstol)
+        println("Done ℋplus")
+        flush(stdout)
+        ℐplus=computeℐplus(reltol,abstol)
+        println("Done ℐplus")
+        flush(stdout)
+        ∂ω𝒪plus=compute∂ω𝒪plus(reltol,abstol)
+        println("Done  ∂ω𝒪plus")
+        flush(stdout)
+        ℋminus= computeℋminus(reltol,abstol)
+        println("Done  ℋminus")
+        flush(stdout)
+        ℐminus=computeℐminus(reltol,abstol)
+        println("Done  ℐminus")
+        flush(stdout)
+        ∂ω𝒪minus=compute∂ω𝒪minus(reltol,abstol)
+        println("Done  ∂ω𝒪minus")
+        flush(stdout)
 
-    δωs=Computeω2(∂ω𝒪plus,∂ω𝒪minus,ℋplus,ℋminus,ℐplus,ℐminus,ψ)
+        if CheckComputeω2Error(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,IminusInt,ψ, depth)
+            return Computeω2(∂ω𝒪plus,∂ω𝒪minus,ℋplus,ℋminus,ℐplus,ℐminus,ψ)
+        else
+            if depth >= max_depth
+                error("Reached maximum recursion depth ($max_depth). Try the group integration procedure.")
+            end
+            println("Numerator of EVP cancelled too much. Running again at with reltol=$(reltol*1e-1).")
+            ComputeIntegrals(reltol*1e-1,abstol,depth=depth+1,max_depth=max_depth)
+        end
+
+    end
+
+
+
+    # δωs=Computeω2(∂ω𝒪plus,∂ω𝒪minus,ℋplus,ℋminus,ℐplus,ℐminus,ψ)
+    # @show δωs
+    δωs=ComputeIntegrals(reltol,abstol; depth=0, max_depth=3)
     @show δωs
 
     push!(freqpertsmatrix, (l, m, n, a, δωs[1], δωs[3], δωs[2], δωs[4]))

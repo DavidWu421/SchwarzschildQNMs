@@ -77,3 +77,20 @@ function Computeω2(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,Imi
     end
     ωs
 end
+
+function CheckComputeω2Error(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,IminusInt,ψ, depth)
+    Dplus=ComputeDplus(ψ)
+    𝒞plus= Compute𝒞plus(ψ,Dplus)
+    γs=Computeγs(∂ωOplusInt,∂ωOminusInt,HplusInt,HminusInt,IplusInt,IminusInt,Dplus,ψ.m,ψ.ω)
+    As=ComputeAs(𝒞plus,Dplus,ψ,γs)
+    Bs= ComputeBs(𝒞plus,Dplus,ψ,γs)
+
+    error1=(1+(abs(As[1]*HplusInt)+abs(conj(Bs[1])IplusInt))/abs(As[1]*HplusInt+conj(Bs[1])IplusInt))
+    error2=(1+(abs(As[2]*HplusInt)+abs(conj(Bs[2])IplusInt))/abs(As[2]*HplusInt+conj(Bs[2])IplusInt))
+
+    if error1 > 10^(1+depth) || error2 > 10^(1+depth)
+        return false
+    else
+        return true
+    end
+end
